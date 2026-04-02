@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heildepot — Ganzheitlich unter Freunden</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --green-dark: #2d5016;
+            --green-main: #4a7c25;
+            --green-medium: #6ba33e;
+            --green-light: #8bc34a;
+            --green-pale: #e8f5e9;
+            --green-bg: #f1f8e9;
+            --gold: #c8a855;
+            --gold-light: #f5ecd0;
+            --white: #ffffff;
+            --text-dark: #1a2e0a;
+            --text-medium: #3d5a1e;
+            --text-light: #6b8e4e;
+            --shadow: 0 2px 12px rgba(45, 80, 22, 0.08);
+            --shadow-hover: 0 4px 20px rgba(45, 80, 22, 0.15);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text-dark);
+            background: var(--white);
+            line-height: 1.6;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--green-pale);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--green-main);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green-dark);
+        }
+
+        .logo-sub {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover { color: var(--green-main); }
+
+        .nav-cta {
+            background: var(--green-main);
+            color: white !important;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .nav-cta:hover { background: var(--green-dark); }
+
+        /* ===== HERO / SEARCH ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--green-pale) 0%, var(--white) 50%, var(--gold-light) 100%);
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--green-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .hero p {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .search-container {
+            max-width: 680px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.5rem 1rem 3.2rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--green-medium);
+            border-radius: 50px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: var(--white);
+            box-shadow: var(--shadow);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--green-main);
+            box-shadow: var(--shadow-hover), 0 0 0 4px rgba(74, 124, 37, 0.1);
+        }
+
+        .search-input::placeholder { color: var(--text-light); }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--green-medium);
+        }
+
+        /* ===== FILTER CHIPS ===== */
+        .filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .filter-chip {
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            border: 1.5px solid var(--green-medium);
+            background: var(--white);
+            color: var(--text-medium);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .filter-chip:hover {
+            background: var(--green-pale);
+            border-color: var(--green-main);
+        }
+
+        .filter-chip.active {
+            background: var(--green-main);
+            color: white;
+            border-color: var(--green-main);
+        }
+
+        /* ===== QUICK SUGGESTIONS ===== */
+        .suggestions {
+            max-width: 700px;
+            margin: 1.5rem auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .suggestion {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+
+        .suggestion:hover {
+            color: var(--green-main);
+            background: var(--green-pale);
+        }
+
+        .suggestion::before {
+            content: "# ";
+            opacity: 0.5;
+        }
+
+        /* ===== RESULTS AREA ===== */
+        .results-area {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: none;
+        }
+
+        .results-area.visible { display: block; }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--green-dark);
+        }
+
+        .results-count {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* ===== PRODUCT CARDS (TOP - CTA) ===== */
+        .products-section {
+            margin-bottom: 2rem;
+        }
+
+        .products-section h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--green-main);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .product-card {
+            background: var(--white);
+            border: 1.5px solid var(--green-pale);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--green-medium);
+            transform: translateY(-2px);
+        }
+
+        .product-badge {
+            display: inline-block;
+            background: var(--green-pale);
+            color: var(--green-main);
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            align-self: flex-start;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            margin-bottom: 0.75rem;
+            flex-grow: 1;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .product-tag {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            background: var(--green-bg);
+            padding: 0.15rem 0.45rem;
+            border-radius: 3px;
+        }
+
+        .product-cta {
+            display: block;
+            text-align: center;
+            background: var(--green-main);
+            color: white;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .product-cta:hover { background: var(--green-dark); }
+
+        /* ===== KNOWLEDGE SECTION (BELOW PRODUCTS) ===== */
+        .knowledge-section {
+            margin-top: 2.5rem;
+        }
+
+        .knowledge-section > h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--green-dark);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--green-pale);
+        }
+
+        .pillar-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--green-pale);
+            overflow-x: auto;
+        }
+
+        .pillar-tab {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .pillar-tab:hover { color: var(--text-medium); }
+
+        .pillar-tab.active {
+            color: var(--green-main);
+            border-bottom-color: var(--green-main);
+            font-weight: 600;
+        }
+
+        .pillar-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pillar-content.visible { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pillar-content h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: var(--green-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .pillar-content p {
+            color: var(--text-medium);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .pillar-content ul {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .pillar-content li {
+            padding: 0.4rem 0;
+            padding-left: 1.25rem;
+            position: relative;
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+
+        .pillar-content li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--green-medium);
+        }
+
+        .info-card {
+            background: var(--green-bg);
+            border-left: 4px solid var(--green-main);
+            padding: 1.25rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            font-style: italic;
+            color: var(--text-medium);
+            margin-bottom: 0;
+        }
+
+        .recipe-card {
+            background: var(--white);
+            border: 1.5px solid var(--gold);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-card h5 {
+            font-family: 'Playfair Display', serif;
+            color: var(--green-dark);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .recipe-card p {
+            font-size: 0.85rem;
+        }
+
+        /* ===== CATEGORIES (HOME STATE) ===== */
+        .categories {
+            max-width: 1100px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+        }
+
+        .categories h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--green-dark);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .category-card {
+            background: var(--white);
+            border: 1.5px solid var(--green-pale);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--green-medium);
+            transform: translateY(-2px);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .category-name {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--green-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .category-desc {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* ===== SAEULEN OVERVIEW ===== */
+        .saeulen {
+            max-width: 1100px;
+            margin: 2rem auto 3rem;
+            padding: 0 2rem;
+        }
+
+        .saeulen h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--green-dark);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .saeulen > p {
+            text-align: center;
+            color: var(--text-medium);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .saeulen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .saeule-card {
+            background: var(--green-bg);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .saeule-card:hover {
+            background: var(--green-pale);
+            transform: translateY(-2px);
+        }
+
+        .saeule-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+
+        .saeule-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--green-dark);
+        }
+
+        /* ===== AI BERATER BUTTON ===== */
+        .ai-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--green-main);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 16px rgba(45, 80, 22, 0.3);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            z-index: 100;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-float:hover {
+            background: var(--green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(45, 80, 22, 0.4);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--green-dark);
+            color: rgba(255,255,255,0.8);
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 3rem;
+        }
+
+        footer a { color: var(--green-light); text-decoration: none; }
+
+        .footer-note {
+            font-style: italic;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            header { padding: 0.75rem 1rem; }
+            nav { gap: 0.75rem; }
+            nav a:not(.nav-cta) { display: none; }
+            .hero { padding: 2.5rem 1rem 2rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .product-grid { grid-template-columns: 1fr 1fr; }
+            .category-grid { grid-template-columns: 1fr 1fr; }
+            .saeulen-grid { grid-template-columns: repeat(3, 1fr); }
+            .pillar-tabs { gap: 0; }
+            .pillar-tab { padding: 0.6rem 0.75rem; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid { grid-template-columns: 1fr; }
+            .category-grid { grid-template-columns: 1fr 1fr; }
+            .saeulen-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="logo">
+        <div class="logo-icon">&#x1F33F;</div>
+        <div>
+            <div class="logo-text">Heildepot</div>
+            <div class="logo-sub">Ganzheitlich unter Freunden</div>
+        </div>
+    </div>
+    <nav>
+        <a href="#" onclick="showHome()">Startseite</a>
+        <a href="#">Krankheitsbilder</a>
+        <a href="#">Kräuter-Lexikon</a>
+        <a href="#">Hexenwissen</a>
+        <a href="#" class="nav-cta">Heildepot-Produkte</a>
+    </nav>
+</header>
+
+<!-- HERO / SEARCH -->
+<div class="hero">
+    <h1>Dein Körper spricht. Wir hören zu.</h1>
+    <p>Finde natürliche Wege zu Gesundheit und Wohlbefinden — mit altem Heilwissen, Psychosomatik und der Kraft der Natur.</p>
+
+    <div class="search-container">
+        <span class="search-icon">&#x1F50D;</span>
+        <input type="text" class="search-input" id="searchInput"
+               placeholder="Was bewegt dich? z.B. Gelenkschmerzen, Kurkuma, Schlaf..."
+               oninput="handleSearch(this.value)"
+               autocomplete="off">
+    </div>
+
+    <div class="filters">
+        <div class="filter-chip active" onclick="toggleFilter(this, 'alle')">Alles</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'symptome')">Symptome</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'produkte')">Produkte</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'kraeuter')">Kräuter</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'ernaehrung')">Ernährung</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'fasten')">Fasten</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'bewegung')">Bewegung & Natur</div>
+        <div class="filter-chip" onclick="toggleFilter(this, 'geist')">Seele & Geist</div>
+    </div>
+
+    <div class="suggestions">
+        <span class="suggestion" onclick="doSearch('Arthrose')">Arthrose</span>
+        <span class="suggestion" onclick="doSearch('Erkältung')">Erkältung</span>
+        <span class="suggestion" onclick="doSearch('Schlafthemen')">Schlaf</span>
+        <span class="suggestion" onclick="doSearch('Kurkuma')">Kurkuma</span>
+        <span class="suggestion" onclick="doSearch('Entzündung')">Entzündung</span>
+        <span class="suggestion" onclick="doSearch('Fasten')">Fasten</span>
+        <span class="suggestion" onclick="doSearch('Borax')">Borax</span>
+        <span class="suggestion" onclick="doSearch('Ketogen')">Ketogen</span>
+        <span class="suggestion" onclick="doSearch('Meditation')">Meditation</span>
+    </div>
+</div>
+
+<!-- RESULTS (hidden by default, shown on search) -->
+<div class="results-area" id="resultsArea">
+
+    <div class="results-header">
+        <h2 id="resultsTitle">Ergebnisse für "Arthrose"</h2>
+        <span class="results-count" id="resultsCount">4 Produkte · 12 Wissenseinträge</span>
+    </div>
+
+    <!-- PRODUCTS FIRST (Call to Action) -->
+    <div class="products-section">
+        <h3>&#x1F33F; Im Heildepot erhältlich</h3>
+        <div class="product-grid" id="productGrid">
+            <!-- filled by JS -->
+        </div>
+    </div>
+
+    <!-- KNOWLEDGE BELOW (6 Pillars as Tabs) -->
+    <div class="knowledge-section">
+        <h3>Ganzheitliches Wissen</h3>
+
+        <div class="pillar-tabs">
+            <div class="pillar-tab active" onclick="showPillar('psychosomatik')">Psychosomatik</div>
+            <div class="pillar-tab" onclick="showPillar('kraeuter')">Kräuter & Stoffe</div>
+            <div class="pillar-tab" onclick="showPillar('ernaehrung')">Ernährung & Rezepte</div>
+            <div class="pillar-tab" onclick="showPillar('fasten')">Fasten & Reinigung</div>
+            <div class="pillar-tab" onclick="showPillar('bewegung')">Bewegung & Natur</div>
+            <div class="pillar-tab" onclick="showPillar('geist')">Seele, Geist & Bewusstsein</div>
+        </div>
+
+        <!-- PSYCHOSOMATIK -->
+        <div class="pillar-content visible" id="pillar-psychosomatik">
+            <div class="info-card">
+                <p>"Wo in deinem Leben bist du starr geworden? Wo hältst du fest, wo Loslassen dran wäre?"</p>
+            </div>
+            <h4>Die Seelenbotschaft der Arthrose</h4>
+            <p>Die Gelenke stehen für Flexibilität, Beweglichkeit, Richtungswechsel. Wenn Gelenke erkranken, zeigt der Körper: Hier gibt es Starrheit. Festgehaltene Muster. Alte Überzeugungen, die einrosten.</p>
+            <p>Das Immunsystem greift körpereigenes Gewebe an — der Mensch greift sich selbst an. Selbstkritik. Alte Schuld. Der Körper spiegelt, was Seele und Geist in sich tragen: einen inneren Kampf.</p>
+            <h4>Jedes Gelenk erzählt seine Geschichte</h4>
+            <ul>
+                <li><strong>Finger / Hände:</strong> Das Greifen nach dem Leben. Festhalten an Kontrolle. "Was hältst du fest, das losgelassen werden will?"</li>
+                <li><strong>Knie:</strong> Demut, Hingabe, Flexibilität. "Wo widersetzt du dich dem natürlichen Fluss?"</li>
+                <li><strong>Hüfte:</strong> Die Tragkraft. "Was trägst du, das du abgeben darfst?"</li>
+                <li><strong>Schultern:</strong> Verantwortung, Pflicht. "Welche Last ist deine, welche gehört einem anderen?"</li>
+            </ul>
+            <p><strong>Heilung beginnt mit:</strong> Frieden schließen. Mit sich selbst. Mit der eigenen Geschichte. Mit dem, was war.</p>
+        </div>
+
+        <!-- KRÄUTER -->
+        <div class="pillar-content" id="pillar-kraeuter">
+            <h4>Kräuter bei Arthrose</h4>
+            <ul>
+                <li><strong>Kurkuma</strong> — Stark entzündungslösend. Mit schwarzem Pfeffer und Fett einnehmen (Bioverfügbarkeit). Als Goldene Milch, Tinktur oder frisch im Essen.</li>
+                <li><strong>Weihrauch (Boswellia)</strong> — Hemmt die Entzündungskaskade. Als Kapseln oder Tinktur.</li>
+                <li><strong>Brennnessel</strong> — Reinigt das Blut, löst Ablagerungen. 3 Tassen Tee täglich.</li>
+                <li><strong>Ingwer</strong> — Wärmt, löst Entzündung, fördert die Durchblutung.</li>
+                <li><strong>Teufelskralle</strong> — Seit Jahrhunderten bei Gelenkbeschwerden bewährt.</li>
+                <li><strong>Beinwell</strong> — "Knochenheiler". Äußerlich als Salbe.</li>
+            </ul>
+            <h4>Stoffe & Substanzen</h4>
+            <ul>
+                <li><strong>Borax</strong> — Spurenelement Bor. Löst Gelenkverkalkungen. 3-6 mg täglich.</li>
+                <li><strong>MSM</strong> — Organischer Schwefel. Baut Knorpel auf. 2-6 g täglich.</li>
+                <li><strong>DMSO</strong> — Äußerlich. Dringt tief ins Gewebe, löst Entzündung.</li>
+                <li><strong>Magnesium</strong> — Transdermal als Öl oder Epsom-Bad.</li>
+            </ul>
+        </div>
+
+        <!-- ERNÄHRUNG -->
+        <div class="pillar-content" id="pillar-ernaehrung">
+            <h4>Ketogene Ernährung bei Arthrose</h4>
+            <p>Entzündung wird befeuert durch Zucker, Getreide und verarbeitete Kohlenhydrate. Wenn der Körper auf Fettverbrennung umstellt (Ketose), sinkt der Insulinspiegel, die Entzündungsbotenstoffe gehen zurück, und die Zellen beginnen sich zu regenerieren.</p>
+            <h4>Lebensmittel, die stärken</h4>
+            <ul>
+                <li>Knochenbrühe — Kollagen, Mineralien, Aminosäuren. Täglich eine Tasse.</li>
+                <li>Fetter Fisch (Lachs, Sardinen) — Omega-3-Fettsäuren</li>
+                <li>Kokosöl, Olivenöl, Avocado, Ghee</li>
+                <li>Grünes Blattgemüse, Kurkuma, Ingwer</li>
+                <li>Fermentiertes (Sauerkraut, Kimchi) — Darmgesundheit</li>
+            </ul>
+            <div class="recipe-card">
+                <h5>Goldene Milch (Kurkuma-Latte)</h5>
+                <p>200 ml Kokosmilch · 1 TL Kurkuma · 1/2 TL Ingwer · 1 Prise schwarzer Pfeffer · 1 TL Kokosöl · Optional: Zimt, Kardamom. Alles sanft erwärmen, 5 Minuten ziehen lassen. Täglich trinken.</p>
+            </div>
+            <div class="recipe-card">
+                <h5>Knochenbrühe — Das flüssige Gold</h5>
+                <p>1-2 kg Markknochen vom Weiderind · 2 EL Apfelessig · Sellerie, Karotten, Zwiebeln · Lorbeer, Thymian. 12-24 Stunden auf kleinster Flamme köcheln. Täglich 1-2 Tassen warm trinken.</p>
+            </div>
+        </div>
+
+        <!-- FASTEN -->
+        <div class="pillar-content" id="pillar-fasten">
+            <h4>Fasten bei Arthrose</h4>
+            <p>Die Entzündungswerte sinken oft schon nach 2-3 Tagen Fasten drastisch. Der Körper schaltet auf Autophagie — er räumt auf, baut geschädigtes Gewebe ab und ersetzt es durch neues.</p>
+            <h4>Empfohlene Fastenformen</h4>
+            <ul>
+                <li><strong>Heilfasten (5-7 Tage)</strong> — Tiefgreifende Entzündungsauflösung. Viele Rheuma-Betroffene erleben hier ihre stärkste Besserung.</li>
+                <li><strong>Intervallfasten (16:8 oder 20:4)</strong> — Tägliche Autophagie-Fenster. In Kombination mit Keto besonders kraftvoll.</li>
+                <li><strong>Basenfasten (7-14 Tage)</strong> — Entsäuert das Gewebe, löst Ablagerungen.</li>
+            </ul>
+            <h4>Reinigungstechniken</h4>
+            <ul>
+                <li><strong>Ölziehen</strong> — Jeden Morgen 15-20 Min. Sesamöl oder Kokosöl im Mund bewegen. Toxine ausleiten.</li>
+                <li><strong>Leberreinigung</strong> — Die Leber entlasten. Wenn sie überlastet ist, landen Toxine in den Gelenken.</li>
+                <li><strong>Schwermetall-Ausleitung</strong> — Zeolith, Chlorella, Koriander, Bärlauch.</li>
+                <li><strong>Entsäuerung</strong> — Natron-Fußbäder (3 EL in warmem Wasser, 30 Min).</li>
+            </ul>
+        </div>
+
+        <!-- BEWEGUNG -->
+        <div class="pillar-content" id="pillar-bewegung">
+            <h4>Bewegung & Natur</h4>
+            <ul>
+                <li><strong>Waldbaden (2 Stunden)</strong> — Senkt Entzündungswerte. Terpene der Bäume stärken das Immunsystem. Die Stille beruhigt das Nervensystem.</li>
+                <li><strong>Yoga</strong> — Yin Yoga (lange gehaltene Dehnungen, 3-5 Min pro Position). Öffnet Faszien, löst Spannungen. Sanftes Hatha: Katze-Kuh, Krieger I, Schulterbrücke.</li>
+                <li><strong>Qi Gong</strong> — Die Acht Brokate. 15-20 Minuten täglich. Alle Gelenke öffnen, Energiefluss wiederherstellen.</li>
+                <li><strong>Wim Hof Methode</strong> — Tiefes Atmen + Kälteexposition. Reguliert das Immunsystem, senkt Entzündungswerte.</li>
+                <li><strong>Barfuß auf der Erde</strong> — Freie Elektronen wirken entzündungslösend. 20-30 Min täglich auf Gras oder Erde.</li>
+                <li><strong>Epsom-Bad</strong> — 300g Epsomit in der Wanne. 30 Minuten. Magnesium über die Haut. Muskeln und Faszien entspannen.</li>
+            </ul>
+        </div>
+
+        <!-- GEIST -->
+        <div class="pillar-content" id="pillar-geist">
+            <h4>Seele, Geist & Bewusstsein — Die Einheit</h4>
+            <p>Arthrose zeigt: Irgendwo ist die Einheit von Seele, Geist und Bewusstsein unterbrochen. Der Körper wird starr, weil etwas im Inneren erstarrt ist. Heilung bedeutet: Zurück in den Fluss. Zurück in die Verbindung mit dem All-Eins.</p>
+
+            <h4>Stille & Meditation</h4>
+            <ul>
+                <li><strong>Stille</strong> — Jeden Tag 20 Minuten. Einfach sein. In die Verbindung mit dem All-Eins gehen.</li>
+                <li><strong>Metta-Meditation</strong> — Liebende Güte. Liebe dahin bringen, wo der Körper sich selbst angreift. "Möge ich gesund sein. Möge ich frei sein."</li>
+                <li><strong>Gehmeditation</strong> — Bewegung und Stille zugleich. Jeden Schritt spüren.</li>
+                <li><strong>Heilvisualisierung</strong> — Goldenes Licht ins Gelenk fließen lassen. Den Knorpel sehen, wie er sich regeneriert.</li>
+            </ul>
+
+            <h4>Manifestation</h4>
+            <div class="info-card">
+                <p>"Meine Gelenke sind frei und geschmeidig. Ich lasse los, was mich steif macht. Jeder Tag bringt mehr Beweglichkeit und Leichtigkeit."</p>
+            </div>
+
+            <h4>Energiearbeit & Vergebung</h4>
+            <ul>
+                <li><strong>Ho'oponopono</strong> — "Es tut mir leid. Bitte vergib mir. Ich liebe dich. Danke." An sich selbst gerichtet.</li>
+                <li><strong>Chakrenarbeit</strong> — Sakralchakra (Beweglichkeit), Solarplexus (Selbstwert).</li>
+                <li><strong>Ahnenarbeit</strong> — Rheuma zieht sich oft durch Familienlinien. Die Muster der Vorfahren erkennen und loslassen.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- HOME CONTENT (visible when no search) -->
+<div id="homeContent">
+    <!-- Categories -->
+    <div class="categories">
+        <h2>Was suchst du?</h2>
+        <div class="category-grid">
+            <div class="category-card" onclick="doSearch('Erkältung')">
+                <div class="category-icon">&#x1F927;</div>
+                <div class="category-name">Atemwege</div>
+                <div class="category-desc">Erkältung, Husten, Nebenhöhlen</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Gelenkschmerzen')">
+                <div class="category-icon">&#x1F9B4;</div>
+                <div class="category-name">Gelenke & Knochen</div>
+                <div class="category-desc">Arthrose, Rheuma, Rücken</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Verdauung')">
+                <div class="category-icon">&#x1F33F;</div>
+                <div class="category-name">Verdauung</div>
+                <div class="category-desc">Magen, Darm, Leber</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Haut')">
+                <div class="category-icon">&#x2728;</div>
+                <div class="category-name">Haut</div>
+                <div class="category-desc">Neurodermitis, Akne, Psoriasis</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Schlafthemen')">
+                <div class="category-icon">&#x1F319;</div>
+                <div class="category-name">Schlaf & Ruhe</div>
+                <div class="category-desc">Einschlafen, Durchschlafen</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Stress')">
+                <div class="category-icon">&#x1F9D8;</div>
+                <div class="category-name">Psyche & Nerven</div>
+                <div class="category-desc">Stress, Erschöpfung, Angst</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Entzündung')">
+                <div class="category-icon">&#x1F525;</div>
+                <div class="category-name">Entzündungen</div>
+                <div class="category-desc">Chronisch, akut, Autoimmun</div>
+            </div>
+            <div class="category-card" onclick="doSearch('Entgiftung')">
+                <div class="category-icon">&#x1F4A7;</div>
+                <div class="category-name">Entgiftung</div>
+                <div class="category-desc">Ausleitung, Fasten, Reinigung</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6 Pillars -->
+    <div class="saeulen">
+        <h2>Die sechs Säulen der Heilung</h2>
+        <p>Seele, Geist und Bewusstsein in Einheit — und daraus formt sich der Körper.</p>
+        <div class="saeulen-grid">
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x1F33F;</div>
+                <div class="saeule-name">Kräuter & Stoffe</div>
+            </div>
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x1F957;</div>
+                <div class="saeule-name">Ernährung & Rezepte</div>
+            </div>
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x1F375;</div>
+                <div class="saeule-name">Fasten & Reinigung</div>
+            </div>
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x1F3DE;&#xFE0F;</div>
+                <div class="saeule-name">Bewegung & Natur</div>
+            </div>
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x2728;</div>
+                <div class="saeule-name">Seele, Geist & Bewusstsein</div>
+            </div>
+            <div class="saeule-card">
+                <div class="saeule-icon">&#x1F91D;</div>
+                <div class="saeule-name">Gemeinschaft</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI BERATER FLOAT -->
+<a class="ai-float" href="#" title="Sprich mit dem Heildepot-Berater">
+    &#x1F4AC; AI-Berater
+</a>
+
+<!-- FOOTER -->
+<footer>
+    <div>Heildepot — Ganzheitlich unter Freunden</div>
+    <div style="margin-top: 0.5rem;">
+        <a href="#">Über uns</a> · <a href="#">Freundeskreis</a> · <a href="#">Mitmachen</a> · <a href="#">Kontakt</a>
+    </div>
+    <div class="footer-note">
+        Erfahrungswissen, geteilt unter Freunden. Dein Arzt begleitet dich auf dem medizinischen Weg — wir begleiten dich auf dem ganzheitlichen.
+    </div>
+</footer>
+
+<script>
+// ===== PRODUCT DATA =====
+const products = {
+    'arthrose': [
+        { name: 'Borax-Tinktur', desc: 'Spurenelement Bor. Löst Gelenkverkalkungen, nährt den Kalziumstoffwechsel.', badge: 'Heildepot', tags: ['#borax', '#gelenke', '#mineralien'] },
+        { name: 'ZeoMont / Zeolith', desc: 'Bindet Schwermetalle und Toxine. Entlastet das Immunsystem.', badge: 'Heildepot', tags: ['#zeolith', '#entgiftung', '#mineralien'] },
+        { name: 'Anorganischer Schwefel', desc: 'Entzündungslösend, reinigt den Darm, unterstützt die Leber.', badge: 'Heildepot', tags: ['#schwefel', '#entzündung', '#darm'] },
+        { name: 'Magnesium-Öl', desc: 'Transdermal. Entspannt Muskeln und Faszien um die Gelenke.', badge: 'Heildepot', tags: ['#magnesium', '#gelenke', '#muskeln'] },
+        { name: 'Epsomit', desc: 'Magnesiumsulfat-Bad. 300g in die Wanne. 30 Min eintauchen.', badge: 'Heildepot', tags: ['#magnesium', '#bad', '#entspannung'] },
+        { name: 'CBD-Öl', desc: 'Schmerzlindernd, entzündungslösend, beruhigend.', badge: 'Heildepot', tags: ['#cbd', '#schmerz', '#entzündung'] },
+        { name: 'Natron', desc: 'Entsäuert das Gewebe. Als Fußbad, Vollbad oder getrunken.', badge: 'Heildepot', tags: ['#natron', '#basisch', '#entsäuerung'] },
+        { name: 'Artemisia Annua', desc: 'Immunregulation, Entzündungslösung. Einjähriger Beifuß.', badge: 'Heildepot', tags: ['#artemisia', '#immunsystem', '#entzündung'] },
+    ],
+    'erkältung': [
+        { name: 'Heiltee', desc: 'Kräutermischung für die Atemwege. Wärmend, lösend, stärkend.', badge: 'Heildepot', tags: ['#tee', '#atemwege', '#kräuter'] },
+        { name: 'Artemisia Annua', desc: 'Stärkt das Immunsystem, wirkt antimikrobiell.', badge: 'Heildepot', tags: ['#artemisia', '#immunsystem'] },
+        { name: 'CBD-Öl', desc: 'Unterstützt die Immunbalance, beruhigt das Nervensystem.', badge: 'Heildepot', tags: ['#cbd', '#immunsystem'] },
+        { name: 'Natron', desc: 'Entsäuert, unterstützt die Abwehrkraft.', badge: 'Heildepot', tags: ['#natron', '#basisch'] },
+    ],
+    'default': [
+        { name: 'Zeolith / ZeoMont', desc: 'Natürliches Vulkanmineral. Bindet Toxine, entlastet den Körper.', badge: 'Heildepot', tags: ['#zeolith', '#entgiftung'] },
+        { name: 'CBD-Vollspektrumöl', desc: 'Hanfextrakt. Beruhigend, entzündungslösend, schmerzlindernd.', badge: 'Heildepot', tags: ['#cbd', '#hanf'] },
+        { name: 'Anorganischer Schwefel', desc: 'Reinigt den Darm, unterstützt die Leber, löst Entzündungen.', badge: 'Heildepot', tags: ['#schwefel', '#darm'] },
+        { name: 'Borax-Tinktur', desc: 'Spurenelement Bor für Knochen und Gelenke.', badge: 'Heildepot', tags: ['#borax', '#mineralien'] },
+    ]
+};
+
+// ===== SEARCH LOGIC =====
+function handleSearch(value) {
+    const query = value.trim().toLowerCase();
+    if (query.length > 1) {
+        showResults(value.trim());
+    } else {
+        showHome();
+    }
+}
+
+function doSearch(term) {
+    document.getElementById('searchInput').value = term;
+    showResults(term);
+}
+
+function showResults(query) {
+    document.getElementById('homeContent').style.display = 'none';
+    document.getElementById('resultsArea').classList.add('visible');
+    document.getElementById('resultsTitle').textContent = 'Ergebnisse für "' + query + '"';
+
+    // Match products
+    const key = query.toLowerCase();
+    let matched = products[key] || products['default'];
+
+    // Try partial match
+    if (!products[key]) {
+        for (const [k, v] of Object.entries(products)) {
+            if (k.includes(key) || key.includes(k)) {
+                matched = v;
+                break;
+            }
+        }
+    }
+
+    document.getElementById('resultsCount').textContent = matched.length + ' Produkte · 6 Wissensbereiche';
+    renderProducts(matched);
+}
+
+function showHome() {
+    document.getElementById('homeContent').style.display = 'block';
+    document.getElementById('resultsArea').classList.remove('visible');
+    document.getElementById('searchInput').value = '';
+}
+
+function renderProducts(items) {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = items.map(p => `
+        <div class="product-card">
+            <span class="product-badge">${p.badge}</span>
+            <div class="product-name">${p.name}</div>
+            <div class="product-desc">${p.desc}</div>
+            <div class="product-tags">
+                ${p.tags.map(t => `<span class="product-tag">${t}</span>`).join('')}
+            </div>
+            <a href="https://heildepot.de" target="_blank" class="product-cta">Im Heildepot ansehen</a>
+        </div>
+    `).join('');
+}
+
+// ===== FILTER CHIPS =====
+function toggleFilter(el, filter) {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// ===== PILLAR TABS =====
+function showPillar(id) {
+    document.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pillar-content').forEach(c => c.classList.remove('visible'));
+
+    event.target.classList.add('active');
+    document.getElementById('pillar-' + id).classList.add('visible');
+}
+</script>
+
+</body>
+</html>
