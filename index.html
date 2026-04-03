@@ -69,9 +69,190 @@
             border-radius: 8px;
             background: var(--white);
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .login-btn:hover { border-color: var(--green-medium); color: var(--green-main); }
+
+        /* ===== FREUNDESKREIS BUTTON (top-left) ===== */
+        .freundeskreis-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            z-index: 200;
+            padding: 0.4rem 1rem;
+            border: 1.5px solid var(--green-pale);
+            border-radius: 8px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .freundeskreis-btn:hover { border-color: var(--green-medium); color: var(--green-main); }
+
+        /* ===== FREUNDESKREIS VIEW ===== */
+        .fk-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(250, 251, 248, 0.98);
+            z-index: 500;
+            overflow-y: auto;
+        }
+
+        .fk-overlay.open { display: block; }
+
+        .fk-close {
+            position: fixed;
+            top: 1rem;
+            right: 1.5rem;
+            z-index: 510;
+            background: var(--white);
+            border: 1.5px solid var(--green-pale);
+            border-radius: 8px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .fk-close:hover { border-color: var(--green-medium); color: var(--green-main); }
+
+        .fk-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .fk-hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .fk-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--green-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .fk-hero p {
+            font-size: 0.95rem;
+            color: var(--text-medium);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .fk-section {
+            margin-bottom: 2rem;
+        }
+
+        .fk-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: var(--green-dark);
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--green-pale);
+        }
+
+        .fk-section p {
+            font-size: 0.88rem;
+            color: var(--text-medium);
+            line-height: 1.7;
+            margin-bottom: 0.75rem;
+        }
+
+        .fk-section .law-ref {
+            font-size: 0.82rem;
+            color: var(--text-light);
+            background: var(--green-bg);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--green-medium);
+        }
+
+        .fk-section .law-ref strong {
+            color: var(--green-dark);
+        }
+
+        .fk-principles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .fk-principle {
+            background: var(--white);
+            border: 1.5px solid var(--green-pale);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+
+        .fk-principle h4 {
+            font-size: 0.85rem;
+            color: var(--green-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .fk-principle p {
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        .fk-cta {
+            text-align: center;
+            background: var(--green-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin: 2rem 0 1rem;
+        }
+
+        .fk-cta h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--green-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .fk-cta p {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            margin-bottom: 1rem;
+        }
+
+        .fk-map-btn {
+            display: inline-block;
+            background: var(--green-main);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .fk-map-btn:hover { background: var(--green-dark); }
+
+        @media (max-width: 600px) {
+            .fk-principles { grid-template-columns: 1fr; }
+            .fk-hero h1 { font-size: 1.5rem; }
+            .freundeskreis-btn { font-size: 0.75rem; padding: 0.35rem 0.7rem; }
+        }
 
         /* Logo */
         .logo-area {
@@ -578,11 +759,124 @@
 </head>
 <body>
 
+<!-- Freundeskreis (top-left) -->
+<button class="freundeskreis-btn" onclick="openFreundeskreis()">&#x1F91D; Freundeskreis</button>
+
 <!-- Login & Cart -->
 <div class="cart-btn" onclick="toggleCart()">
     &#x1F6D2; Warenkorb <span class="cart-badge" id="cartBadge">0</span>
 </div>
-<a href="#" class="login-btn">Anmelden</a>
+<a href="#" class="login-btn" onclick="event.preventDefault(); wotLogin()">Anmelden</a>
+
+<!-- ===== FREUNDESKREIS OVERLAY ===== -->
+<div class="fk-overlay" id="fkOverlay">
+    <button class="fk-close" onclick="closeFreundeskreis()">&#x2715; Schließen</button>
+    <div class="fk-content">
+
+        <div class="fk-hero">
+            <h1>Unter Freunden</h1>
+            <p>Das Heildepot ist kein Shop. Es ist ein geschlossener Kreis von Menschen, die sich im echten Leben begegnet sind und Erfahrungswissen teilen.</p>
+        </div>
+
+        <!-- WARUM FREUNDESKREIS? -->
+        <div class="fk-section">
+            <h2>Warum funktioniert das?</h2>
+            <p>Im deutschen und europäischen Recht gibt es einen klaren Unterschied zwischen gewerblichem Handel und privatem Austausch unter Freunden. Wer sich persönlich kennt und einander gelegentlich Kräuter, Heilmittel oder Erfahrungswissen weitergibt, handelt im Rahmen der <strong>Privatautonomie</strong> — nicht als Unternehmer.</p>
+            <p>Das ist keine Grauzone. Es ist geltendes Recht.</p>
+        </div>
+
+        <!-- RECHTLICHE GRUNDLAGEN -->
+        <div class="fk-section">
+            <h2>Rechtliche Grundlagen</h2>
+
+            <div class="law-ref">
+                <strong>Art. 2 Abs. 1 GG — Allgemeine Handlungsfreiheit</strong><br>
+                Jeder hat das Recht, seine Angelegenheiten frei zu regeln. Die Privatautonomie ist ein Grundrecht.
+            </div>
+
+            <div class="law-ref">
+                <strong>§ 311 Abs. 1 BGB — Vertragsfreiheit</strong><br>
+                Private Personen können ihre Rechtsbeziehungen frei gestalten: ob, mit wem und zu welchen Bedingungen.
+            </div>
+
+            <div class="law-ref">
+                <strong>§ 516 BGB — Schenkung</strong><br>
+                Wenn Freunde Kräuter teilen und der Empfänger freiwillig einen Wertausgleich gibt, ist das rechtlich eine Schenkung mit freiwilliger Zuwendung — kein Kaufvertrag.
+            </div>
+
+            <div class="law-ref">
+                <strong>§ 13 / § 14 BGB — Verbraucher vs. Unternehmer</strong><br>
+                Wer nicht gewerblich handelt, nicht regelmäßig verkauft und nicht öffentlich auf dem Markt auftritt, ist Privatperson. Der Freundeskreis ist kein Gewerbe.
+            </div>
+
+            <div class="law-ref">
+                <strong>§ 22 Nr. 3 EStG — Freigrenze</strong><br>
+                Für gelegentliche private Einkünfte gilt eine Freigrenze von 256 € pro Jahr. Echte Schenkungen unter Freunden sind steuerlich nicht relevant.
+            </div>
+        </div>
+
+        <!-- INTERNATIONALES PRIVATRECHT -->
+        <div class="fk-section">
+            <h2>Internationales Privatrecht</h2>
+            <p>Wenn Freunde in verschiedenen Ländern leben, greift das internationale Privatrecht (IPR). Es bestimmt, welches Recht gilt.</p>
+
+            <div class="law-ref">
+                <strong>Art. 3 Rom I-VO (EG Nr. 593/2008) — Freie Rechtswahl</strong><br>
+                Vertragsparteien können frei wählen, welches Recht auf ihre Vereinbarung anwendbar ist. Bei privaten Vereinbarungen unter Freunden greift der Verbraucherschutz nach Art. 6 Rom I-VO nicht, da es sich nicht um gewerbliche Verbraucherverträge handelt.
+            </div>
+
+            <div class="law-ref">
+                <strong>Art. 3–5 EGBGB — Anwendbares Recht</strong><br>
+                Bei Sachverhalten mit Auslandsbezug bestimmen diese Vorschriften, welches Recht gilt. Es wird auf das Recht des Staates verwiesen, dem die Person angehört oder mit dem die engste Verbindung besteht.
+            </div>
+
+            <div class="law-ref">
+                <strong>Art. 4 Rom I-VO — Mangels Rechtswahl</strong><br>
+                Wird keine Rechtswahl getroffen, gilt das Recht des Staates, in dem die Partei mit der charakteristischen Leistung ihren gewöhnlichen Aufenthalt hat.
+            </div>
+
+            <p>Das bedeutet: Auch international können Freunde frei vereinbaren, unter welchen Bedingungen sie Erfahrungswissen und Heilmittel teilen.</p>
+        </div>
+
+        <!-- PRINZIPIEN -->
+        <div class="fk-section">
+            <h2>Unsere Prinzipien</h2>
+            <div class="fk-principles">
+                <div class="fk-principle">
+                    <h4>Reale Begegnung</h4>
+                    <p>Nur wer sich im echten Leben begegnet ist, kann hier teilnehmen. Der Handshake passiert über das Web of Trust.</p>
+                </div>
+                <div class="fk-principle">
+                    <h4>Freiwilliger Wertausgleich</h4>
+                    <p>Es gibt keine festen Preise. Du entscheidest selbst, was du geben möchtest. Wertschöpfung statt Konsum.</p>
+                </div>
+                <div class="fk-principle">
+                    <h4>Geschlossener Kreis</h4>
+                    <p>Kein öffentlicher Marktauftritt. Kein Gewerbe. Freunde, die füreinander da sind.</p>
+                </div>
+                <div class="fk-principle">
+                    <h4>Erfahrungswissen</h4>
+                    <p>Wir teilen Kräuter als Lebensmittel und Tee. Keine Heilversprechen. Erfahrung von Freund zu Freund.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- WEB OF TRUST -->
+        <div class="fk-section">
+            <h2>Zugang über das Web of Trust</h2>
+            <p>Dieses Netzwerk wächst durch echte Begegnungen. Dein Login funktioniert über das <strong>Web of Trust</strong> — ein dezentrales Vertrauensnetzwerk ohne zentrale Autorität.</p>
+            <p>Jemand, der bereits im Freundeskreis ist, bestätigt durch eine persönliche Begegnung, dass er dich kennt. Dieser Handshake wird kryptographisch gesichert und gibt dir Zugang.</p>
+            <p>So wissen wir: Jeder Mensch hier ist ein Freund eines Freundes. Vertrauen, das auf echter Verbindung basiert.</p>
+        </div>
+
+        <!-- HINWEIS -->
+        <div class="closing-note" style="margin-top:2rem;">
+            <p>Dies ist eine rechtliche Orientierung, keine Rechtsberatung.<br>
+            <strong>Freunde teilen. Das war schon immer so. Und es ist gut so.</strong></p>
+        </div>
+
+    </div>
+</div>
 
 <!-- Cart Drawer -->
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
@@ -636,9 +930,11 @@
 
 <script src="data-1.js"></script>
 <script src="data-2.js"></script>
+<script src="data-3.js"></script>
+<script src="data-4.js"></script>
 <script src="products.js"></script>
 <script>
-const ALL = [...CONDITIONS_1, ...CONDITIONS_2];
+const ALL = [...CONDITIONS_1, ...CONDITIONS_2, ...CONDITIONS_3, ...CONDITIONS_4];
 
 // Build search index for conditions
 const IDX = ALL.map(c => {
@@ -1322,6 +1618,33 @@ function checkout() {
     const orderText = `Hallo René,\n\nich möchte gerne folgendes bestellen:\n\n${lines.join('\n')}\n\nGesamt: ${total},- €\n\nHerzliche Grüße`;
     const mailTo = `mailto:?subject=Heildepot Bestellung&body=${encodeURIComponent(orderText)}`;
     window.open(mailTo);
+}
+
+// ===== FREUNDESKREIS =====
+function openFreundeskreis() {
+    document.getElementById('fkOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFreundeskreis() {
+    document.getElementById('fkOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// ===== WEB OF TRUST LOGIN =====
+function wotLogin() {
+    // Placeholder: In Zukunft wird hier das WoT-Login integriert
+    alert(
+        'Web of Trust Login\n\n' +
+        'Um das Heildepot nutzen zu können, brauchst du eine Einladung ' +
+        'von einem Freund, dem du im echten Leben begegnet bist.\n\n' +
+        'Der Handshake funktioniert über das Web of Trust:\n' +
+        '1. Triff einen Freund im Netzwerk\n' +
+        '2. Scannt gegenseitig euren QR-Code\n' +
+        '3. Euer Vertrauen wird kryptographisch bestätigt\n' +
+        '4. Du erhältst Zugang zum Freundeskreis\n\n' +
+        'Dieses Feature wird bald mit dem Web of Trust verbunden.'
+    );
 }
 </script>
 
