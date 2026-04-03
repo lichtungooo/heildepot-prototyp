@@ -617,8 +617,7 @@
         <span class="search-icon">&#x1F50D;</span>
         <input type="text" class="search-input" id="searchInput"
                placeholder="Symptome, Ernährung, Bewegung, Heilmittel..."
-               onkeydown="if(event.key==='Enter') handleSearch(this.value)"
-               oninput="onType(this.value)"
+               oninput="autoSearch(this.value)"
                autocomplete="off">
     </div>
     <div class="search-hint">Beschreibe deine Symptome oder suche nach Heilmitteln, Ernährungsformen, Fastenmethoden...</div>
@@ -641,7 +640,7 @@
 <script>
 const ALL = [...CONDITIONS_1, ...CONDITIONS_2];
 
-// Build search index
+// Build search index for conditions
 const IDX = ALL.map(c => {
     const blob = [
         c.name, c.id, ...c.tags,
@@ -653,31 +652,37 @@ const IDX = ALL.map(c => {
         c.fasten.text, ...c.fasten.formen,
         c.bewegung.text, ...c.bewegung.praktiken,
         c.geist.einheit, ...c.geist.affirmationen, c.geist.meditation, c.geist.energie,
-        ...c.produkte.map(p => p.name + ' ' + p.desc),
     ].join(' ').toLowerCase();
     return { c, blob };
 });
 
+// Build search index for products
+const PIDX = PRODUCTS.map(p => {
+    const blob = [p.name, p.desc, p.wirkung, p.kategorie, ...p.tags, ...p.symptome].join(' ').toLowerCase();
+    return { p, blob };
+});
+
 let lastQuery = '';
+let searchTimer = null;
 
-function onType(val) {
-    // Auto-search after short pause (or let them press enter)
-}
-
-function handleSearch(val) {
+// Auto-search with debounce
+function autoSearch(val) {
+    clearTimeout(searchTimer);
     const q = val.trim();
-    if (q.length < 2) return;
-    lastQuery = q;
-    doSearch(q);
+    if (q.length < 2) {
+        if (q.length === 0) showHome();
+        return;
+    }
+    searchTimer = setTimeout(() => doSearch(q), 300);
 }
 
 function doSearch(query) {
     document.getElementById('searchInput').value = query;
     lastQuery = query;
-
     const terms = query.toLowerCase().replace(/#/g, '').split(/\s+/).filter(t => t.length > 1);
-    const results = [];
 
+    // Search conditions
+    const condResults = [];
     IDX.forEach(item => {
         let score = 0;
         terms.forEach(term => {
@@ -686,56 +691,334 @@ function doSearch(query) {
             if (item.c.tags.some(t => t.replace('#','').includes(term))) score += 8;
             if (item.c.kraeuter.some(k => k.name.toLowerCase().includes(term))) score += 6;
             if (item.c.stoffe.some(s => s.name.toLowerCase().includes(term))) score += 6;
-            if (item.c.produkte.some(p => p.name.toLowerCase().includes(term))) score += 5;
-            // Ernährung keywords
-            if (['ernährung','ernaehrung','ernährungsform','essen','nahrung','diät','diet'].includes(term)) {
-                score += 3; // show all
-            }
-            if (['fasten','fasting','reinigung','detox','entgiftung'].includes(term)) {
-                score += 3;
-            }
             if (item.blob.includes(term)) score += 2;
         });
-        if (score > 0) results.push({ c: item.c, score });
+        if (score > 0) condResults.push({ c: item.c, score });
     });
+    condResults.sort((a, b) => b.score - a.score);
 
-    results.sort((a, b) => b.score - a.score);
+    // Search products
+    const prodResults = [];
+    PIDX.forEach(item => {
+        let score = 0;
+        terms.forEach(term => {
+            if (item.p.name.toLowerCase().includes(term)) score += 15;
+            if (item.p.kategorie.toLowerCase().includes(term)) score += 8;
+            if (item.p.tags.some(t => t.replace('#','').includes(term))) score += 6;
+            if (item.blob.includes(term)) score += 2;
+        });
+        if (score > 0) prodResults.push({ p: item.p, score });
+    });
+    prodResults.sort((a, b) => b.score - a.score);
 
     // Collapse landing
     document.getElementById('landing').classList.add('collapsed');
-
     const stream = document.getElementById('resultsStream');
     stream.classList.add('visible');
     document.getElementById('footer').style.display = 'block';
 
-    if (results.length === 0) {
+    // Determine what to show
+    const topProd = prodResults.length > 0 ? prodResults[0] : null;
+    const topCond = condResults.length > 0 ? condResults[0] : null;
+
+    // Direct product match (e.g. "Natron", "Borax", "CBD") → show product detail
+    if (topProd && topProd.score >= 10 && (!topCond || topProd.score >= topCond.score)) {
+        showProductDetail(topProd.p, prodResults.map(r => r.p));
+        return;
+    }
+
+    // Strong single condition match → show condition detail
+    if (topCond && topCond.score >= 10 && condResults.length === 1) {
+        showDetail(topCond.c);
+        return;
+    }
+
+    if (topCond && topCond.score >= 10 && condResults.length > 1 && topCond.score > condResults[1].score * 1.5) {
+        showDetail(topCond.c);
+        return;
+    }
+
+    // Mixed results → show list
+    if (condResults.length === 0 && prodResults.length === 0) {
         document.getElementById('sectionNav').classList.remove('visible');
         stream.innerHTML = `<div class="info-block" style="text-align:center; padding:2rem;"><p>Für "${query}" haben wir noch keinen Eintrag. Versuche es mit einem anderen Begriff.</p></div>`;
         return;
     }
 
-    // Single strong match or direct → show detail
-    if (results.length === 1 || (results[0].score >= 10 && (results.length === 1 || results[0].score > results[1].score * 1.5))) {
-        showDetail(results[0].c);
-        return;
+    // Show combined results
+    document.getElementById('sectionNav').classList.remove('visible');
+    let html = '<div class="result-block">';
+    html += `<p style="color:var(--text-light); font-size:0.85rem; margin-bottom:0.75rem;">Ergebnisse für "${query}"</p>`;
+
+    // Products first
+    if (prodResults.length > 0) {
+        html += `<h3 class="section-header" style="margin-top:0;">Produkte im HEILDEPOT</h3><div class="section-divider"></div>`;
+        prodResults.slice(0, 8).forEach(r => {
+            html += `
+                <div class="product-card-big" style="margin-bottom:0.6rem;">
+                    <div class="product-info">
+                        <h4>${r.p.name}</h4>
+                        <div class="product-price">${r.p.preis},- €</div>
+                        <div class="product-menge">${r.p.menge}</div>
+                        <p>${r.p.desc}</p>
+                        <div class="tags">${r.p.tags.map(t => `<span class="tag" onclick="event.stopPropagation(); doSearch('${t.replace('#','')}')">${t}</span>`).join('')}</div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
+                        <button class="add-to-cart" onclick="addToCart('${r.p.id}')" id="atc-${r.p.id}">&#x1F6D2; In den Warenkorb</button>
+                        <span style="font-size:0.75rem; color:var(--text-light); cursor:pointer; text-decoration:underline;" onclick="showProductDetail(PRODUCTS.find(x=>x.id==='${r.p.id}'))">Mehr erfahren</span>
+                    </div>
+                </div>`;
+        });
     }
 
-    // Multiple results → show list
-    document.getElementById('sectionNav').classList.remove('visible');
-    stream.innerHTML = `
-        <div class="result-block">
-            <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:0.75rem;">${results.length} Ergebnisse für "${query}"</p>
-            ${results.map(r => `
+    // Then conditions
+    if (condResults.length > 0) {
+        html += `<h3 class="section-header">Krankheitsbilder</h3><div class="section-divider"></div>`;
+        condResults.slice(0, 10).forEach(r => {
+            html += `
                 <div class="condition-option" onclick="showDetail(ALL.find(x=>x.id==='${r.c.id}'))">
                     <div>
                         <h3>${r.c.name}</h3>
                         <p>${r.c.psychosomatik.zitat}</p>
                     </div>
                     <span class="arrow">&#x2192;</span>
+                </div>`;
+        });
+    }
+
+    html += '</div>';
+    stream.innerHTML = html;
+}
+
+// ===== PRODUCT DETAIL VIEW =====
+function showProductDetail(product, allMatched) {
+    const stream = document.getElementById('resultsStream');
+    stream.classList.add('visible');
+
+    // Which conditions does this product help with?
+    const relatedConditions = ALL.filter(c => product.symptome.includes(c.id));
+
+    // Other products in same category
+    const sameCategory = PRODUCTS.filter(p => p.kategorie === product.kategorie && p.id !== product.id);
+
+    // Build sticky nav
+    const nav = document.getElementById('sectionNav');
+    const sections = [
+        { id: 'sec-produkt', label: 'Produkt' },
+        { id: 'sec-wirkung', label: 'Wirkung' },
+        { id: 'sec-anwendung', label: 'Anwendung' },
+        { id: 'sec-krankheitsbilder', label: 'Hilft bei' },
+        { id: 'sec-weitere', label: 'Weitere Produkte' },
+    ];
+    nav.innerHTML = sections.map(s => `<a href="#${s.id}" onclick="smoothScroll('${s.id}'); return false;">${s.label}</a>`).join('');
+    nav.classList.add('visible');
+
+    stream.innerHTML = `
+        <!-- PRODUCT HEADER -->
+        <div class="result-block">
+            <div style="font-size:0.75rem; color:var(--text-light); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.25rem;">${product.kategorie}</div>
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--green-dark); margin-bottom:0.25rem;">${product.name}</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem;">
+                ${product.tags.map(t => `<span class="tag" onclick="doSearch('${t.replace('#','')}')" style="font-size:0.72rem; color:var(--green-main); background:var(--green-pale); padding:0.15rem 0.5rem; border-radius:50px; cursor:pointer;">${t}</span>`).join('')}
+            </div>
+        </div>
+
+        <!-- PRODUKT + WARENKORB (FIRST!) -->
+        <h3 class="section-header" id="sec-produkt">Bestellen</h3>
+        <div class="section-divider"></div>
+        <div class="product-card-big" style="border-width:2px;">
+            <div class="product-info">
+                <div class="product-price" style="font-size:1.6rem;">${product.preis},- €</div>
+                <div class="product-menge">${product.menge}</div>
+                <p style="margin-top:0.5rem;">${product.desc}</p>
+            </div>
+            <button class="add-to-cart" onclick="addToCart('${product.id}')" id="atc-${product.id}" style="font-size:1rem; padding:0.65rem 1.5rem;">&#x1F6D2; In den Warenkorb</button>
+        </div>
+        ${sameCategory.length > 0 ? `
+            <div class="info-block">
+                <h4>Weitere Größen & Varianten</h4>
+                ${sameCategory.map(p => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid var(--green-pale);">
+                        <div>
+                            <strong>${p.name}</strong> <span style="color:var(--text-light); font-size:0.82rem;">${p.menge}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.75rem;">
+                            <span style="font-weight:600; color:var(--green-main);">${p.preis},- €</span>
+                            <button class="add-to-cart" onclick="addToCart('${p.id}')" id="atc-${p.id}" style="padding:0.35rem 0.75rem; font-size:0.78rem;">&#x1F6D2;</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        ` : ''}
+
+        <!-- WIRKUNG -->
+        <h3 class="section-header" id="sec-wirkung">Wirkung & Eigenschaften</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <p>${product.wirkung}</p>
+        </div>
+
+        <!-- ANWENDUNG -->
+        <h3 class="section-header" id="sec-anwendung">Anwendung & Wissenswertes</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <p>${product.desc}</p>
+            ${product.tags.includes('#borax') ? `
+                <h4>Dosierung (Erfahrungswerte)</h4>
+                <ul>
+                    <li>Borax-Tinktur: 3-6 mg Bor täglich, in Wasser gelöst</li>
+                    <li>Borax-Pulver: Eine Messerspitze (ca. 3 mg Bor) in 1 Liter Wasser auflösen, über den Tag trinken</li>
+                    <li>Äußerlich: Als Fußbad (1 TL auf 3 Liter warmes Wasser)</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#zeolith') || product.tags.includes('#montmorillonit') ? `
+                <h4>Dosierung (Erfahrungswerte)</h4>
+                <ul>
+                    <li>1-2 gehäufte Teelöffel täglich in Wasser einrühren</li>
+                    <li>30 Minuten vor oder 2 Stunden nach dem Essen</li>
+                    <li>Ausreichend Wasser trinken (mind. 2 Liter täglich)</li>
+                    <li>Kur über 4-8 Wochen, dann 2 Wochen Pause</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#schwefel') ? `
+                <h4>Dosierung (Erfahrungswerte)</h4>
+                <ul>
+                    <li>Einschleichend beginnen: 1/8 TL, langsam steigern auf 1/2 TL</li>
+                    <li>Morgens nüchtern oder abends vor dem Schlafen</li>
+                    <li>In Wasser oder Saft einrühren</li>
+                    <li>Die Darmreinigung kann intensiv sein — viel trinken</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#magnesium') && product.tags.includes('#bad') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>Vollbad: 300-500g Epsomit in warmem Wasser auflösen, 20-30 Minuten baden</li>
+                    <li>Fußbad: 3-4 EL in einer Schüssel warmes Wasser</li>
+                    <li>Magnesium wird über die Haut aufgenommen — ideal am Abend</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#magnesium') && product.tags.includes('#transdermal') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>Direkt auf die Haut sprühen oder einmassieren</li>
+                    <li>Besonders auf verspannte Stellen, Nacken, Schultern, Waden</li>
+                    <li>20 Minuten einwirken lassen, dann abwaschen</li>
+                    <li>Kann anfangs kribbeln — das ist normal und lässt nach</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#natron') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>Trinken: 1/2 TL in einem Glas Wasser, morgens nüchtern</li>
+                    <li>Basenbad: 3 EL in die volle Badewanne, 30-45 Minuten baden</li>
+                    <li>Fußbad: 2 EL in warmem Wasser, 20-30 Minuten</li>
+                    <li>Mundspülung: 1/2 TL in einem Glas Wasser gurgeln</li>
+                    <li>Bei Sodbrennen: 1/2 TL in Wasser — wirkt sofort</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#cbd') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>Tropfen unter die Zunge geben, 60 Sekunden halten, dann schlucken</li>
+                    <li>Einstiegsdosis: 2-3 Tropfen, 2× täglich</li>
+                    <li>Langsam steigern bis zur gewünschten Wirkung</li>
+                    <li>Abends für Schlaf, morgens und mittags für Schmerzlinderung</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#artemisia') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>Als Tee: 1 TL getrocknetes Kraut mit heißem Wasser übergießen, 10-15 Min ziehen</li>
+                    <li>Kur: 2-3 Tassen täglich über 7-14 Tage</li>
+                    <li>Dann 7 Tage Pause, bei Bedarf wiederholen</li>
+                    <li>Auch als Tinktur oder Kapseln möglich</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#tee') ? `
+                <h4>Zubereitung</h4>
+                <ul>
+                    <li>1-2 TL pro Tasse mit kochendem Wasser übergießen</li>
+                    <li>8-10 Minuten zugedeckt ziehen lassen</li>
+                    <li>2-3 Tassen täglich, warm genießen</li>
+                    <li>Ideal morgens nüchtern und abends vor dem Schlafen</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#heilpilz') || product.tags.includes('#löwenmähne') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>1/2 - 1 TL Pulver täglich, in warmem Wasser, Tee oder Smoothie</li>
+                    <li>Regelmäßig über mehrere Wochen einnehmen für beste Wirkung</li>
+                    <li>Ideal morgens für Klarheit und Konzentration</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#kratom') ? `
+                <h4>Anwendung (Erfahrungswerte)</h4>
+                <ul>
+                    <li>Kleine Dosis (1-2g): Energiegebend, stimmungsaufhellend</li>
+                    <li>Mittlere Dosis (3-4g): Schmerzlindernd, beruhigend</li>
+                    <li>In Wasser einrühren oder als Tee aufbrühen</li>
+                    <li>Achtsam dosieren, auf den eigenen Körper hören</li>
+                </ul>
+            ` : ''}
+            ${product.tags.includes('#knoblauch') ? `
+                <h4>Anwendung</h4>
+                <ul>
+                    <li>20-30 Tropfen 2-3× täglich in etwas Wasser</li>
+                    <li>Bei Erkältung: Dosis verdoppeln über 3-5 Tage</li>
+                    <li>Kur für Gefäßreinigung: 3 Monate täglich einnehmen</li>
+                </ul>
+            ` : ''}
+        </div>
+
+        <!-- KRANKHEITSBILDER -->
+        <h3 class="section-header" id="sec-krankheitsbilder">Hilft bei diesen Beschwerden</h3>
+        <div class="section-divider"></div>
+        ${relatedConditions.map(c => `
+            <div class="condition-option" onclick="showDetail(ALL.find(x=>x.id==='${c.id}'))">
+                <div>
+                    <h3>${c.name}</h3>
+                    <p>${c.psychosomatik.zitat}</p>
+                </div>
+                <span class="arrow">&#x2192;</span>
+            </div>
+        `).join('')}
+
+        <!-- WEITERE PRODUKTE -->
+        ${(allMatched || []).filter(p => p.id !== product.id).length > 0 ? `
+            <h3 class="section-header" id="sec-weitere">Weitere passende Produkte</h3>
+            <div class="section-divider"></div>
+            ${(allMatched || PRODUCTS).filter(p => p.id !== product.id).slice(0, 6).map(p => `
+                <div class="product-card-big" style="margin-bottom:0.6rem;">
+                    <div class="product-info">
+                        <h4>${p.name}</h4>
+                        <div class="product-price">${p.preis},- €</div>
+                        <div class="product-menge">${p.menge}</div>
+                        <p>${p.desc}</p>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.4rem; align-items:flex-end;">
+                        <button class="add-to-cart" onclick="addToCart('${p.id}')" id="atc-${p.id}">&#x1F6D2; In den Warenkorb</button>
+                        <span style="font-size:0.75rem; color:var(--text-light); cursor:pointer; text-decoration:underline;" onclick="showProductDetail(PRODUCTS.find(x=>x.id==='${p.id}'))">Mehr erfahren</span>
+                    </div>
                 </div>
             `).join('')}
+        ` : ''}
+
+        <!-- CLOSING -->
+        <div class="closing-note">
+            <p>Erfahrungswissen, geteilt unter Freunden.
+            <strong>Dein Körper hat die Kraft zu heilen. Dein Geist hat die Kraft, ihn dabei zu führen.</strong></p>
         </div>
     `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setupScrollSpy();
+}
+
+function showHome() {
+    document.getElementById('landing').classList.remove('collapsed');
+    document.getElementById('resultsStream').classList.remove('visible');
+    document.getElementById('sectionNav').classList.remove('visible');
+    document.getElementById('footer').style.display = 'none';
 }
 
 function showDetail(c) {
