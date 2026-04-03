@@ -9,7 +9,7 @@
 
         :root {
             --green-dark: #2d5016;
-            --green-main: #4a7c25;
+            --green-main: #6aab3d;
             --green-medium: #6ba33e;
             --green-light: #8bc34a;
             --green-pale: #e8f5e9;
@@ -17,9 +17,11 @@
             --gold: #c8a855;
             --gold-light: #f5ecd0;
             --white: #ffffff;
+            --bg: #fafbf8;
             --text-dark: #1a2e0a;
             --text-medium: #3d5a1e;
             --text-light: #6b8e4e;
+            --text-muted: #9cb88a;
             --shadow: 0 2px 12px rgba(45, 80, 22, 0.08);
             --shadow-hover: 0 4px 20px rgba(45, 80, 22, 0.15);
             --radius: 12px;
@@ -30,640 +32,676 @@
         body {
             font-family: 'Inter', -apple-system, sans-serif;
             color: var(--text-dark);
-            background: var(--white);
+            background: var(--bg);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
-        header {
-            background: var(--white);
-            border-bottom: 1px solid var(--green-pale);
-            padding: 0.75rem 2rem;
+        /* ===== LANDING STATE (centered, like Claude) ===== */
+        .landing {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            transition: all 0.4s ease;
+        }
+
+        .landing.collapsed {
+            min-height: auto;
+            padding: 1.5rem 2rem 0;
+            justify-content: flex-start;
+        }
+
+        /* Login top-right */
+        .login-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            z-index: 200;
+            padding: 0.4rem 1rem;
+            border: 1.5px solid var(--green-pale);
+            border-radius: 8px;
+            background: var(--white);
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover { border-color: var(--green-medium); color: var(--green-main); }
+
+        /* Logo */
+        .logo-area {
+            text-align: center;
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+        }
+
+        .landing.collapsed .logo-area { margin-bottom: 1rem; }
+
+        .logo-cross {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            transition: all 0.4s ease;
+        }
+
+        .landing.collapsed .logo-cross { width: 48px; height: 48px; margin-bottom: 0.5rem; }
+
+        /* SVG green cross */
+        .logo-cross svg { width: 100%; height: 100%; }
+
+        .logo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            transition: font-size 0.4s ease;
+        }
+
+        .landing.collapsed .logo-title { font-size: 1.4rem; }
+
+        .logo-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+            transition: all 0.4s ease;
+        }
+
+        .landing.collapsed .logo-subtitle { font-size: 0.75rem; }
+
+        /* Search */
+        .search-area {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1.25rem 1rem 3rem;
+            font-size: 1rem;
+            border: 2px solid #d4e4cc;
+            border-radius: 16px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: var(--white);
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .search-input:focus { border-color: var(--green-main); box-shadow: var(--shadow-hover), 0 0 0 4px rgba(106, 171, 61, 0.1); }
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .search-hint {
+            text-align: center;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: opacity 0.3s;
+        }
+
+        .landing.collapsed .search-hint { display: none; }
+
+        /* ===== RESULTS (chat-like, flows down) ===== */
+        .results-stream {
+            display: none;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 1rem 2rem 4rem;
+        }
+
+        .results-stream.visible { display: block; }
+
+        /* Sticky section nav */
+        .section-nav {
+            display: none;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 90;
+            background: rgba(250, 251, 248, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--green-pale);
+            padding: 0.5rem 0;
+            margin: 0 -2rem;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .logo { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
-        .logo-icon {
-            width: 40px; height: 40px;
-            background: var(--green-main); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.2rem;
+        .section-nav.visible { display: flex; gap: 0.25rem; flex-wrap: nowrap; }
+
+        .section-nav a {
+            padding: 0.4rem 0.85rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 50px;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border: 1.5px solid transparent;
         }
-        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--green-dark); }
-        .logo-sub { font-size: 0.7rem; color: var(--text-light); letter-spacing: 0.05em; }
 
-        nav { display: flex; gap: 1.25rem; align-items: center; }
-        nav a { text-decoration: none; color: var(--text-medium); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
-        nav a:hover { color: var(--green-main); }
-        .nav-cta { background: var(--green-main); color: white !important; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 600; }
-        .nav-cta:hover { background: var(--green-dark); }
+        .section-nav a:hover { color: var(--green-main); background: var(--green-pale); }
+        .section-nav a.active { background: var(--green-main); color: white; border-color: var(--green-main); }
 
-        /* HERO */
-        .hero {
-            background: linear-gradient(135deg, var(--green-pale) 0%, var(--white) 50%, var(--gold-light) 100%);
-            padding: 3rem 2rem 2rem; text-align: center;
+        /* ===== RESULT BLOCKS (chat bubbles) ===== */
+        .result-block {
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.3s ease;
         }
-        .hero h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; color: var(--green-dark); margin-bottom: 0.4rem; }
-        .hero > p { color: var(--text-medium); font-size: 1rem; margin-bottom: 1.5rem; max-width: 550px; margin-left: auto; margin-right: auto; }
 
-        .search-container { max-width: 640px; margin: 0 auto 1rem; position: relative; }
-        .search-input {
-            width: 100%; padding: 0.9rem 1.5rem 0.9rem 3rem; font-size: 1rem;
-            border: 2px solid var(--green-medium); border-radius: 50px; outline: none;
-            font-family: 'Inter', sans-serif; color: var(--text-dark); background: var(--white);
-            box-shadow: var(--shadow); transition: border-color 0.2s, box-shadow 0.2s;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .search-input:focus { border-color: var(--green-main); box-shadow: var(--shadow-hover), 0 0 0 4px rgba(74, 124, 37, 0.1); }
-        .search-input::placeholder { color: var(--text-light); }
-        .search-icon { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: var(--green-medium); }
 
-        .filters { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.4rem; max-width: 700px; margin: 0 auto; }
-        .filter-chip {
-            padding: 0.35rem 0.9rem; border-radius: 50px; border: 1.5px solid var(--green-medium);
-            background: var(--white); color: var(--text-medium); font-size: 0.8rem; font-weight: 500;
-            cursor: pointer; transition: all 0.2s; user-select: none;
+        /* Multiple condition results */
+        .condition-option {
+            background: var(--white);
+            border: 1.5px solid var(--green-pale);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .filter-chip:hover { background: var(--green-pale); }
-        .filter-chip.active { background: var(--green-main); color: white; border-color: var(--green-main); }
 
-        .suggestions { max-width: 700px; margin: 1rem auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
-        .suggestion { font-size: 0.78rem; color: var(--text-light); cursor: pointer; padding: 0.2rem 0.5rem; border-radius: 4px; transition: all 0.2s; }
-        .suggestion:hover { color: var(--green-main); background: var(--green-pale); }
-        .suggestion::before { content: "#"; opacity: 0.5; margin-right: 1px; }
+        .condition-option:hover { border-color: var(--green-medium); box-shadow: var(--shadow); transform: translateY(-1px); }
+        .condition-option h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--green-dark); }
+        .condition-option p { font-size: 0.82rem; color: var(--text-medium); margin-top: 0.2rem; font-style: italic; }
+        .condition-option .arrow { color: var(--green-medium); font-size: 1.1rem; flex-shrink: 0; margin-left: 1rem; }
 
-        /* RESULTS */
-        .results-area { max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem; display: none; }
-        .results-area.visible { display: block; }
-        .results-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
-        .results-header h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green-dark); }
-        .results-count { color: var(--text-light); font-size: 0.85rem; }
-        .matched-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1rem; }
-        .matched-tag { font-size: 0.75rem; color: var(--green-main); background: var(--green-pale); padding: 0.2rem 0.6rem; border-radius: 50px; cursor: pointer; font-weight: 500; }
-        .matched-tag:hover { background: var(--green-main); color: white; }
-
-        /* CONDITION CARDS (clickable results) */
-        .condition-list { margin-bottom: 2rem; }
-        .condition-card {
-            background: var(--white); border: 1.5px solid var(--green-pale); border-radius: var(--radius);
-            padding: 1.25rem; margin-bottom: 0.75rem; cursor: pointer; transition: all 0.2s;
-            display: flex; justify-content: space-between; align-items: center;
+        /* Section headers */
+        .section-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--green-dark);
+            margin: 2rem 0 0.75rem;
+            padding-top: 1rem;
+            scroll-margin-top: 60px;
         }
-        .condition-card:hover { box-shadow: var(--shadow-hover); border-color: var(--green-medium); transform: translateY(-1px); }
-        .condition-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--green-dark); }
-        .condition-card p { font-size: 0.85rem; color: var(--text-medium); margin-top: 0.25rem; }
-        .condition-card .card-tags { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.4rem; }
-        .condition-card .card-tag { font-size: 0.7rem; color: var(--text-light); background: var(--green-bg); padding: 0.1rem 0.4rem; border-radius: 3px; }
-        .condition-card .arrow { color: var(--green-medium); font-size: 1.2rem; flex-shrink: 0; margin-left: 1rem; }
 
-        /* DETAIL VIEW */
-        .detail-view { display: none; }
-        .detail-view.visible { display: block; }
-        .detail-back { cursor: pointer; color: var(--green-main); font-size: 0.85rem; font-weight: 500; margin-bottom: 1rem; display: inline-block; }
-        .detail-back:hover { color: var(--green-dark); }
-        .detail-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--green-dark); margin-bottom: 0.25rem; }
-        .detail-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1.5rem; }
-        .detail-tag { font-size: 0.75rem; color: var(--green-main); background: var(--green-pale); padding: 0.2rem 0.6rem; border-radius: 50px; cursor: pointer; }
-        .detail-tag:hover { background: var(--green-main); color: white; }
+        .section-header:first-child { margin-top: 0.5rem; }
 
-        /* PRODUCTS IN DETAIL */
-        .products-section { margin-bottom: 2rem; }
-        .products-section h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--green-main); margin-bottom: 0.75rem; font-weight: 600; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
-        .product-card {
-            background: var(--white); border: 1.5px solid var(--green-pale); border-radius: var(--radius);
-            padding: 1rem; transition: all 0.2s; display: flex; flex-direction: column;
+        .section-divider {
+            height: 1px;
+            background: var(--green-pale);
+            margin: 0.25rem 0 0;
         }
-        .product-card:hover { box-shadow: var(--shadow-hover); border-color: var(--green-medium); transform: translateY(-2px); }
-        .product-badge { display: inline-block; background: var(--green-pale); color: var(--green-main); font-size: 0.65rem; font-weight: 600; padding: 0.15rem 0.4rem; border-radius: 4px; margin-bottom: 0.4rem; align-self: flex-start; text-transform: uppercase; letter-spacing: 0.05em; }
-        .product-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; color: var(--green-dark); margin-bottom: 0.3rem; }
-        .product-desc { font-size: 0.8rem; color: var(--text-medium); margin-bottom: 0.5rem; flex-grow: 1; }
-        .product-tags { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-bottom: 0.5rem; }
-        .product-tag { font-size: 0.65rem; color: var(--text-light); background: var(--green-bg); padding: 0.1rem 0.35rem; border-radius: 3px; }
-        .product-cta {
-            display: block; text-align: center; background: var(--green-main); color: white;
-            padding: 0.5rem 0.75rem; border-radius: 8px; text-decoration: none;
-            font-weight: 600; font-size: 0.85rem; transition: background 0.2s;
+
+        /* Product cards (prominent, first thing) */
+        .product-card-big {
+            background: var(--white);
+            border: 2px solid var(--green-medium);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            transition: all 0.2s;
         }
-        .product-cta:hover { background: var(--green-dark); }
 
-        /* PILLAR TABS */
-        .knowledge-section { margin-top: 2rem; }
-        .knowledge-section > h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--green-dark); margin-bottom: 0.75rem; border-bottom: 2px solid var(--green-pale); padding-bottom: 0.4rem; }
-        .pillar-tabs { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 2px solid var(--green-pale); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .pillar-tab { padding: 0.6rem 1rem; font-size: 0.8rem; font-weight: 500; color: var(--text-light); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; white-space: nowrap; }
-        .pillar-tab:hover { color: var(--text-medium); }
-        .pillar-tab.active { color: var(--green-main); border-bottom-color: var(--green-main); font-weight: 600; }
-        .pillar-content { display: none; animation: fadeIn 0.3s ease; }
-        .pillar-content.visible { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .product-card-big:hover { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
 
-        .pillar-content h4 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--green-dark); margin: 1.25rem 0 0.5rem 0; }
-        .pillar-content h4:first-child { margin-top: 0; }
-        .pillar-content p { color: var(--text-medium); margin-bottom: 0.75rem; font-size: 0.9rem; line-height: 1.7; }
-        .pillar-content ul { list-style: none; margin-bottom: 0.75rem; }
-        .pillar-content li { padding: 0.35rem 0 0.35rem 1.2rem; position: relative; color: var(--text-medium); font-size: 0.88rem; line-height: 1.6; }
-        .pillar-content li::before { content: "→"; position: absolute; left: 0; color: var(--green-medium); }
+        .product-info { flex: 1; }
+        .product-info h4 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--green-dark); margin-bottom: 0.25rem; }
+        .product-info p { font-size: 0.85rem; color: var(--text-medium); margin-bottom: 0.5rem; }
+        .product-info .tags { display: flex; flex-wrap: wrap; gap: 0.2rem; margin-bottom: 0.5rem; }
+        .product-info .tag { font-size: 0.65rem; color: var(--text-light); background: var(--green-bg); padding: 0.1rem 0.4rem; border-radius: 3px; cursor: pointer; }
+        .product-info .tag:hover { background: var(--green-main); color: white; }
 
-        .info-card { background: var(--green-bg); border-left: 4px solid var(--green-main); padding: 1rem 1.25rem; border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: 1rem; }
-        .info-card p { font-style: italic; color: var(--text-medium); margin-bottom: 0; font-size: 0.95rem; }
-
-        .recipe-card { background: var(--white); border: 1.5px solid var(--gold); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; }
-        .recipe-card h5 { font-family: 'Playfair Display', serif; color: var(--green-dark); font-size: 0.95rem; margin-bottom: 0.35rem; }
-        .recipe-card .recipe-meta { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.3rem; }
-        .recipe-card p { font-size: 0.85rem; }
-
-        .affirm-list { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
-        .affirm-item { background: var(--gold-light); padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.88rem; color: var(--text-dark); font-style: italic; }
-
-        /* HOME */
-        .categories { max-width: 1100px; margin: 2.5rem auto; padding: 0 2rem; }
-        .categories h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green-dark); text-align: center; margin-bottom: 1.5rem; }
-        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; }
-        .category-card { background: var(--white); border: 1.5px solid var(--green-pale); border-radius: var(--radius); padding: 1.25rem; text-align: center; cursor: pointer; transition: all 0.2s; }
-        .category-card:hover { box-shadow: var(--shadow-hover); border-color: var(--green-medium); transform: translateY(-2px); }
-        .category-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        .category-name { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 0.95rem; color: var(--green-dark); margin-bottom: 0.2rem; }
-        .category-desc { font-size: 0.75rem; color: var(--text-light); }
-
-        .saeulen { max-width: 1100px; margin: 2rem auto 2.5rem; padding: 0 2rem; }
-        .saeulen h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--green-dark); text-align: center; margin-bottom: 0.3rem; }
-        .saeulen > p { text-align: center; color: var(--text-medium); margin-bottom: 1.5rem; font-size: 0.9rem; }
-        .saeulen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }
-        .saeule-card { background: var(--green-bg); border-radius: var(--radius); padding: 1rem; text-align: center; transition: all 0.2s; cursor: default; }
-        .saeule-icon { font-size: 1.4rem; margin-bottom: 0.35rem; }
-        .saeule-name { font-weight: 600; font-size: 0.8rem; color: var(--green-dark); }
-
-        /* AI float */
-        .ai-float {
-            position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--green-main);
-            color: white; padding: 0.7rem 1.25rem; border-radius: 50px;
-            box-shadow: 0 4px 16px rgba(45, 80, 22, 0.3); cursor: pointer;
-            font-weight: 600; font-size: 0.85rem; z-index: 100; transition: all 0.2s;
-            text-decoration: none; display: flex; align-items: center; gap: 0.4rem;
+        .product-cta-btn {
+            display: inline-block;
+            background: var(--green-main);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: center;
         }
-        .ai-float:hover { background: var(--green-dark); transform: translateY(-2px); }
 
-        footer { background: var(--green-dark); color: rgba(255,255,255,0.8); padding: 1.5rem 2rem; text-align: center; font-size: 0.8rem; margin-top: 2rem; }
-        footer a { color: var(--green-light); text-decoration: none; }
-        .footer-note { font-style: italic; margin-top: 0.75rem; font-size: 0.75rem; opacity: 0.7; max-width: 550px; margin-left: auto; margin-right: auto; }
+        .product-cta-btn:hover { background: var(--green-dark); }
 
+        /* Info blocks */
+        .info-block {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--green-pale);
+        }
+
+        .info-block h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--green-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-block p { font-size: 0.88rem; color: var(--text-medium); line-height: 1.7; margin-bottom: 0.5rem; }
+        .info-block p:last-child { margin-bottom: 0; }
+
+        .info-block ul { list-style: none; margin: 0.5rem 0; }
+        .info-block li { padding: 0.3rem 0 0.3rem 1.2rem; position: relative; font-size: 0.86rem; color: var(--text-medium); line-height: 1.6; }
+        .info-block li::before { content: "→"; position: absolute; left: 0; color: var(--green-medium); }
+
+        .quote-block {
+            background: var(--green-bg);
+            border-left: 4px solid var(--green-main);
+            padding: 1rem 1.25rem;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .quote-block p { font-style: italic; color: var(--text-medium); font-size: 0.95rem; margin: 0; }
+
+        .affirm-block { display: flex; flex-direction: column; gap: 0.35rem; margin: 0.5rem 0; }
+        .affirm-item { background: var(--gold-light); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.86rem; color: var(--text-dark); font-style: italic; }
+
+        .recipe-block {
+            background: var(--white);
+            border: 1.5px solid var(--gold);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .recipe-block h5 { font-family: 'Playfair Display', serif; color: var(--green-dark); font-size: 0.95rem; margin-bottom: 0.3rem; }
+        .recipe-block .meta { font-size: 0.78rem; color: var(--text-light); margin-bottom: 0.3rem; }
+        .recipe-block p { font-size: 0.83rem; color: var(--text-medium); }
+
+        /* Closing note */
+        .closing-note {
+            background: var(--green-bg);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .closing-note p { font-style: italic; color: var(--text-medium); font-size: 0.88rem; margin: 0; }
+        .closing-note strong { display: block; margin-top: 0.5rem; font-style: normal; }
+
+        /* Footer minimal */
+        .footer-mini {
+            text-align: center;
+            padding: 2rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-mini a { color: var(--text-light); text-decoration: none; }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            header { padding: 0.6rem 1rem; }
-            nav a:not(.nav-cta) { display: none; }
-            .hero { padding: 2rem 1rem 1.5rem; }
-            .hero h1 { font-size: 1.6rem; }
-            .product-grid { grid-template-columns: 1fr 1fr; }
-            .category-grid { grid-template-columns: 1fr 1fr; }
-            .pillar-tab { padding: 0.5rem 0.6rem; font-size: 0.72rem; }
-            .detail-title { font-size: 1.4rem; }
+            .landing { padding: 1.5rem; }
+            .logo-cross { width: 60px; height: 60px; }
+            .logo-title { font-size: 1.8rem; }
+            .results-stream { padding: 0.75rem 1rem 4rem; }
+            .section-nav { margin: 0 -1rem; padding-left: 1rem; padding-right: 1rem; }
+            .product-card-big { flex-direction: column; }
+            .product-cta-btn { align-self: stretch; text-align: center; }
         }
+
         @media (max-width: 480px) {
-            .product-grid { grid-template-columns: 1fr; }
-            .saeulen-grid { grid-template-columns: repeat(3, 1fr); }
+            .logo-title { font-size: 1.5rem; }
+            .landing.collapsed .logo-title { font-size: 1.2rem; }
+            .landing.collapsed .logo-cross { width: 36px; height: 36px; }
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="logo" onclick="showHome()">
-        <div class="logo-icon">&#x1F33F;</div>
-        <div><div class="logo-text">Heildepot</div><div class="logo-sub">Ganzheitlich unter Freunden</div></div>
-    </div>
-    <nav>
-        <a href="#" onclick="showHome(); return false;">Startseite</a>
-        <a href="#" onclick="showAllConditions(); return false;">Krankheitsbilder</a>
-        <a href="#" onclick="event.preventDefault();">Kräuter-Lexikon</a>
-        <a href="#" onclick="event.preventDefault();">Hexenwissen</a>
-        <a href="https://heildepot.de" target="_blank" class="nav-cta">Heildepot-Shop</a>
-    </nav>
-</header>
 
-<div class="hero">
-    <h1>Dein Körper spricht. Wir hören zu.</h1>
-    <p>Finde natürliche Wege zu Gesundheit und Wohlbefinden — mit altem Heilwissen, Psychosomatik und der Kraft der Natur.</p>
-    <div class="search-container">
-        <span class="search-icon">&#x1F50D;</span>
-        <input type="text" class="search-input" id="searchInput" placeholder="Was bewegt dich? z.B. Gelenkschmerzen, Kurkuma, Schlaf..." oninput="handleSearch(this.value)" autocomplete="off">
-    </div>
-    <div class="filters" id="filtersBar">
-        <div class="filter-chip active" data-filter="alle" onclick="setFilter(this)">Alles</div>
-        <div class="filter-chip" data-filter="symptome" onclick="setFilter(this)">Symptome</div>
-        <div class="filter-chip" data-filter="produkte" onclick="setFilter(this)">Produkte</div>
-        <div class="filter-chip" data-filter="kraeuter" onclick="setFilter(this)">Kräuter</div>
-        <div class="filter-chip" data-filter="ernaehrung" onclick="setFilter(this)">Ernährung</div>
-        <div class="filter-chip" data-filter="fasten" onclick="setFilter(this)">Fasten</div>
-        <div class="filter-chip" data-filter="bewegung" onclick="setFilter(this)">Bewegung</div>
-        <div class="filter-chip" data-filter="geist" onclick="setFilter(this)">Seele & Geist</div>
-    </div>
-    <div class="suggestions" id="suggestionsBar"></div>
-</div>
+<!-- Login -->
+<a href="#" class="login-btn">Anmelden</a>
 
-<!-- RESULTS LIST -->
-<div class="results-area" id="resultsArea">
-    <div class="results-header">
-        <h2 id="resultsTitle"></h2>
-        <span class="results-count" id="resultsCount"></span>
-    </div>
-    <div class="matched-tags" id="matchedTags"></div>
-    <div class="condition-list" id="conditionList"></div>
-</div>
-
-<!-- DETAIL VIEW -->
-<div class="results-area detail-view" id="detailView">
-    <span class="detail-back" onclick="goBack()">&#x2190; Zurück zu den Ergebnissen</span>
-    <div id="detailContent"></div>
-</div>
-
-<!-- HOME -->
-<div id="homeContent">
-    <div class="categories">
-        <h2>Was suchst du?</h2>
-        <div class="category-grid" id="categoryGrid"></div>
-    </div>
-    <div class="saeulen">
-        <h2>Die sechs Säulen der Heilung</h2>
-        <p>Seele, Geist und Bewusstsein in Einheit — und daraus formt sich der Körper.</p>
-        <div class="saeulen-grid">
-            <div class="saeule-card"><div class="saeule-icon">&#x1F33F;</div><div class="saeule-name">Kräuter & Stoffe</div></div>
-            <div class="saeule-card"><div class="saeule-icon">&#x1F957;</div><div class="saeule-name">Ernährung & Rezepte</div></div>
-            <div class="saeule-card"><div class="saeule-icon">&#x1F375;</div><div class="saeule-name">Fasten & Reinigung</div></div>
-            <div class="saeule-card"><div class="saeule-icon">&#x1F3DE;&#xFE0F;</div><div class="saeule-name">Bewegung & Natur</div></div>
-            <div class="saeule-card"><div class="saeule-icon">&#x2728;</div><div class="saeule-name">Seele, Geist & Bewusstsein</div></div>
-            <div class="saeule-card"><div class="saeule-icon">&#x1F91D;</div><div class="saeule-name">Gemeinschaft</div></div>
+<!-- LANDING (centered, Claude-style) -->
+<div class="landing" id="landing">
+    <div class="logo-area">
+        <div class="logo-cross">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M35,8 C35,4 38,0 42,0 L58,0 C62,0 65,4 65,8 L65,35 L92,35 C96,35 100,38 100,42 L100,58 C100,62 96,65 92,65 L65,65 L65,92 C65,96 62,100 58,100 L42,100 C38,100 35,96 35,92 L35,65 L8,65 C4,65 0,62 0,58 L0,42 C0,38 4,35 8,35 L35,35 Z" fill="#6aab3d"/>
+            </svg>
         </div>
+        <div class="logo-title">Heildepot</div>
+        <div class="logo-subtitle">Ganzheitlich unter Freunden</div>
     </div>
+
+    <div class="search-area">
+        <span class="search-icon">&#x1F50D;</span>
+        <input type="text" class="search-input" id="searchInput"
+               placeholder="Symptome, Ernährung, Bewegung, Heilmittel..."
+               onkeydown="if(event.key==='Enter') handleSearch(this.value)"
+               oninput="onType(this.value)"
+               autocomplete="off">
+    </div>
+    <div class="search-hint">Beschreibe deine Symptome oder suche nach Heilmitteln, Ernährungsformen, Fastenmethoden...</div>
 </div>
 
-<a class="ai-float" href="#" title="Sprich mit dem Heildepot-Berater">&#x1F4AC; AI-Berater</a>
+<!-- STICKY SECTION NAV (appears when detail is shown) -->
+<div class="section-nav" id="sectionNav"></div>
 
-<footer>
-    <div>Heildepot — Ganzheitlich unter Freunden</div>
-    <div style="margin-top:0.4rem;"><a href="#">Über uns</a> · <a href="#">Freundeskreis</a> · <a href="#">Mitmachen</a></div>
-    <div class="footer-note">Erfahrungswissen, geteilt unter Freunden. Dein Arzt begleitet dich auf dem medizinischen Weg — wir begleiten dich auf dem ganzheitlichen.</div>
-</footer>
+<!-- RESULTS STREAM (chat-like, flows down) -->
+<div class="results-stream" id="resultsStream"></div>
+
+<!-- FOOTER -->
+<div class="footer-mini" id="footer" style="display:none;">
+    Erfahrungswissen, geteilt unter Freunden. · <a href="https://heildepot.de" target="_blank">heildepot.de</a>
+</div>
 
 <script src="data-1.js"></script>
 <script src="data-2.js"></script>
 <script>
-// ===== MERGE ALL DATA =====
-const ALL_CONDITIONS = [...CONDITIONS_1, ...CONDITIONS_2];
+const ALL = [...CONDITIONS_1, ...CONDITIONS_2];
 
-// ===== SEARCH INDEX =====
-// Build a flat searchable index
-function buildIndex() {
-    const idx = [];
-    ALL_CONDITIONS.forEach(c => {
-        // searchable text blob per condition
-        const blob = [
-            c.name, c.id,
-            ...c.tags,
-            c.koerper,
-            c.psychosomatik.zitat, c.psychosomatik.text,
-            ...Object.values(c.traditionen),
-            ...c.kraeuter.map(k => k.name + ' ' + k.wirkung),
-            ...c.stoffe.map(s => s.name + ' ' + s.wirkung),
-            c.ernaehrung.empfehlung,
-            ...c.ernaehrung.staerkend,
-            c.fasten.text,
-            ...c.fasten.formen,
-            c.bewegung.text,
-            ...c.bewegung.praktiken,
-            c.geist.einheit,
-            ...c.geist.affirmationen,
-            c.geist.meditation, c.geist.energie,
-            ...c.produkte.map(p => p.name + ' ' + p.desc),
-        ].join(' ').toLowerCase();
-        idx.push({ condition: c, blob });
-    });
-    return idx;
-}
-const INDEX = buildIndex();
+// Build search index
+const IDX = ALL.map(c => {
+    const blob = [
+        c.name, c.id, ...c.tags,
+        c.koerper, c.psychosomatik.zitat, c.psychosomatik.text,
+        ...Object.values(c.traditionen),
+        ...c.kraeuter.map(k => k.name + ' ' + k.wirkung),
+        ...c.stoffe.map(s => s.name + ' ' + s.wirkung),
+        c.ernaehrung.empfehlung, ...c.ernaehrung.staerkend,
+        c.fasten.text, ...c.fasten.formen,
+        c.bewegung.text, ...c.bewegung.praktiken,
+        c.geist.einheit, ...c.geist.affirmationen, c.geist.meditation, c.geist.energie,
+        ...c.produkte.map(p => p.name + ' ' + p.desc),
+    ].join(' ').toLowerCase();
+    return { c, blob };
+});
 
-// Collect all unique tags
-const ALL_TAGS = [...new Set(ALL_CONDITIONS.flatMap(c => c.tags))].sort();
-
-// ===== CATEGORIES =====
-const CATEGORIES = [
-    { icon: '&#x1F927;', name: 'Atemwege', desc: 'Erkältung, Grippe, Husten', query: 'atemwege' },
-    { icon: '&#x1F9B4;', name: 'Gelenke & Knochen', desc: 'Arthrose, Rheuma, Rücken', query: 'gelenke' },
-    { icon: '&#x1F33F;', name: 'Verdauung', desc: 'Magen, Darm, Sodbrennen', query: 'verdauung' },
-    { icon: '&#x2728;', name: 'Haut', desc: 'Neurodermitis, Ekzeme', query: 'haut' },
-    { icon: '&#x1F319;', name: 'Schlaf & Ruhe', desc: 'Einschlafen, Durchschlafen', query: 'schlaf' },
-    { icon: '&#x1F9D8;', name: 'Psyche & Nerven', desc: 'Stress, Angst, Schwermut', query: 'stress angst depression' },
-    { icon: '&#x1F525;', name: 'Entzündungen', desc: 'Chronisch, Autoimmun', query: 'entzündung autoimmun' },
-    { icon: '&#x2764;&#xFE0F;', name: 'Herz & Kreislauf', desc: 'Bluthochdruck, Diabetes', query: 'bluthochdruck diabetes' },
-    { icon: '&#x1F4A7;', name: 'Entgiftung & Fasten', desc: 'Ausleitung, Reinigung', query: 'fasten entgiftung' },
-    { icon: '&#x1F9EC;', name: 'Schilddrüse & Hormone', desc: 'Hashimoto, Unterfunktion', query: 'schilddrüse' },
-];
-
-// ===== POPULAR SUGGESTIONS =====
-const POPULAR = ['Arthrose', 'Erkältung', 'Schlaf', 'Kurkuma', 'Entzündung', 'Fasten', 'Borax', 'Stress', 'Krebs', 'Depression', 'Allergie', 'Kopfschmerzen', 'Verdauung', 'Haut', 'Meditation'];
-
-// State
 let lastQuery = '';
-let activeFilter = 'alle';
-let currentView = 'home'; // home, results, detail
 
-// ===== INIT =====
-function init() {
-    // Render categories
-    const cg = document.getElementById('categoryGrid');
-    cg.innerHTML = CATEGORIES.map(cat => `
-        <div class="category-card" onclick="doSearch('${cat.query}')">
-            <div class="category-icon">${cat.icon}</div>
-            <div class="category-name">${cat.name}</div>
-            <div class="category-desc">${cat.desc}</div>
-        </div>`).join('');
-
-    // Render suggestions
-    const sg = document.getElementById('suggestionsBar');
-    sg.innerHTML = POPULAR.map(s => `<span class="suggestion" onclick="doSearch('${s}')">${s}</span>`).join('');
+function onType(val) {
+    // Auto-search after short pause (or let them press enter)
 }
 
-// ===== SEARCH =====
-function handleSearch(value) {
-    const q = value.trim();
-    if (q.length > 1) {
-        showResults(q);
-    } else if (q.length === 0) {
-        showHome();
-    }
+function handleSearch(val) {
+    const q = val.trim();
+    if (q.length < 2) return;
+    lastQuery = q;
+    doSearch(q);
 }
 
-function doSearch(term) {
-    document.getElementById('searchInput').value = term;
-    showResults(term);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+function doSearch(query) {
+    document.getElementById('searchInput').value = query;
+    lastQuery = query;
 
-function search(query) {
     const terms = query.toLowerCase().replace(/#/g, '').split(/\s+/).filter(t => t.length > 1);
     const results = [];
-    INDEX.forEach(item => {
+
+    IDX.forEach(item => {
         let score = 0;
         terms.forEach(term => {
-            // exact name match
-            if (item.condition.name.toLowerCase().includes(term)) score += 10;
-            // exact id match
-            if (item.condition.id.includes(term)) score += 10;
-            // tag match
-            if (item.condition.tags.some(t => t.replace('#','').includes(term))) score += 8;
-            // kraeuter name match
-            if (item.condition.kraeuter.some(k => k.name.toLowerCase().includes(term))) score += 6;
-            // stoffe name match
-            if (item.condition.stoffe.some(s => s.name.toLowerCase().includes(term))) score += 6;
-            // produkte name match
-            if (item.condition.produkte.some(p => p.name.toLowerCase().includes(term))) score += 5;
-            // blob match
+            if (item.c.name.toLowerCase().includes(term)) score += 10;
+            if (item.c.id.includes(term)) score += 10;
+            if (item.c.tags.some(t => t.replace('#','').includes(term))) score += 8;
+            if (item.c.kraeuter.some(k => k.name.toLowerCase().includes(term))) score += 6;
+            if (item.c.stoffe.some(s => s.name.toLowerCase().includes(term))) score += 6;
+            if (item.c.produkte.some(p => p.name.toLowerCase().includes(term))) score += 5;
+            // Ernährung keywords
+            if (['ernährung','ernaehrung','ernährungsform','essen','nahrung','diät','diet'].includes(term)) {
+                score += 3; // show all
+            }
+            if (['fasten','fasting','reinigung','detox','entgiftung'].includes(term)) {
+                score += 3;
+            }
             if (item.blob.includes(term)) score += 2;
         });
-        if (score > 0) results.push({ condition: item.condition, score });
+        if (score > 0) results.push({ c: item.c, score });
     });
+
     results.sort((a, b) => b.score - a.score);
-    return results;
-}
 
-// ===== SHOW RESULTS =====
-function showResults(query) {
-    lastQuery = query;
-    currentView = 'results';
-    document.getElementById('homeContent').style.display = 'none';
-    document.getElementById('detailView').classList.remove('visible');
-    const ra = document.getElementById('resultsArea');
-    ra.classList.add('visible');
+    // Collapse landing
+    document.getElementById('landing').classList.add('collapsed');
 
-    const results = search(query);
-    document.getElementById('resultsTitle').textContent = results.length > 0
-        ? `Ergebnisse für "${query}"`
-        : `Keine Treffer für "${query}"`;
-    document.getElementById('resultsCount').textContent = `${results.length} Krankheitsbilder gefunden`;
+    const stream = document.getElementById('resultsStream');
+    stream.classList.add('visible');
+    document.getElementById('footer').style.display = 'block';
 
-    // Matched tags
-    const matchedTagsSet = new Set();
-    results.forEach(r => r.condition.tags.forEach(t => matchedTagsSet.add(t)));
-    const mt = document.getElementById('matchedTags');
-    mt.innerHTML = [...matchedTagsSet].slice(0, 15).map(t =>
-        `<span class="matched-tag" onclick="doSearch('${t.replace('#','')}')">${t}</span>`
-    ).join('');
-
-    // Condition list
-    const cl = document.getElementById('conditionList');
     if (results.length === 0) {
-        cl.innerHTML = `<p style="color:var(--text-light); text-align:center; padding:2rem;">Versuche einen anderen Suchbegriff oder klicke auf einen Hashtag oben.</p>`;
+        document.getElementById('sectionNav').classList.remove('visible');
+        stream.innerHTML = `<div class="info-block" style="text-align:center; padding:2rem;"><p>Für "${query}" haben wir noch keinen Eintrag. Versuche es mit einem anderen Begriff.</p></div>`;
         return;
     }
 
-    // If exactly one high-confidence match, go directly to detail
-    if (results.length === 1 || (results.length > 1 && results[0].score > results[1].score * 2)) {
-        showDetail(results[0].condition.id);
+    // Single strong match or direct → show detail
+    if (results.length === 1 || (results[0].score >= 10 && (results.length === 1 || results[0].score > results[1].score * 1.5))) {
+        showDetail(results[0].c);
         return;
     }
 
-    cl.innerHTML = results.map(r => {
-        const c = r.condition;
-        return `<div class="condition-card" onclick="showDetail('${c.id}')">
-            <div>
-                <h3>${c.name}</h3>
-                <p>${c.psychosomatik.zitat}</p>
-                <div class="card-tags">${c.tags.slice(0, 5).map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
-            </div>
-            <span class="arrow">&#x2192;</span>
-        </div>`;
-    }).join('');
-}
-
-// ===== SHOW ALL CONDITIONS =====
-function showAllConditions() {
-    lastQuery = '';
-    currentView = 'results';
-    document.getElementById('homeContent').style.display = 'none';
-    document.getElementById('detailView').classList.remove('visible');
-    document.getElementById('searchInput').value = '';
-    const ra = document.getElementById('resultsArea');
-    ra.classList.add('visible');
-    document.getElementById('resultsTitle').textContent = 'Alle Krankheitsbilder';
-    document.getElementById('resultsCount').textContent = `${ALL_CONDITIONS.length} Einträge`;
-    document.getElementById('matchedTags').innerHTML = '';
-
-    const cl = document.getElementById('conditionList');
-    cl.innerHTML = ALL_CONDITIONS.map(c =>
-        `<div class="condition-card" onclick="showDetail('${c.id}')">
-            <div>
-                <h3>${c.name}</h3>
-                <p>${c.psychosomatik.zitat}</p>
-                <div class="card-tags">${c.tags.slice(0, 5).map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
-            </div>
-            <span class="arrow">&#x2192;</span>
-        </div>`
-    ).join('');
-}
-
-// ===== SHOW DETAIL =====
-function showDetail(id) {
-    const c = ALL_CONDITIONS.find(x => x.id === id);
-    if (!c) return;
-    currentView = 'detail';
-    document.getElementById('homeContent').style.display = 'none';
-    document.getElementById('resultsArea').classList.remove('visible');
-    const dv = document.getElementById('detailView');
-    dv.classList.add('visible');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    const dc = document.getElementById('detailContent');
-    dc.innerHTML = `
-        <h1 class="detail-title">${c.name}</h1>
-        <div class="detail-tags">${c.tags.map(t => `<span class="detail-tag" onclick="doSearch('${t.replace('#','')}')">${t}</span>`).join('')}</div>
-
-        <!-- PRODUCTS FIRST -->
-        <div class="products-section">
-            <h3>&#x1F33F; Im Heildepot erhältlich</h3>
-            <div class="product-grid">
-                ${c.produkte.map(p => `
-                    <div class="product-card">
-                        <span class="product-badge">Heildepot</span>
-                        <div class="product-name">${p.name}</div>
-                        <div class="product-desc">${p.desc}</div>
-                        <div class="product-tags">${(p.tags||[]).map(t => `<span class="product-tag">${t}</span>`).join('')}</div>
-                        <a href="https://heildepot.de" target="_blank" class="product-cta">Im Heildepot ansehen</a>
+    // Multiple results → show list
+    document.getElementById('sectionNav').classList.remove('visible');
+    stream.innerHTML = `
+        <div class="result-block">
+            <p style="color:var(--text-light); font-size:0.85rem; margin-bottom:0.75rem;">${results.length} Ergebnisse für "${query}"</p>
+            ${results.map(r => `
+                <div class="condition-option" onclick="showDetail(ALL.find(x=>x.id==='${r.c.id}'))">
+                    <div>
+                        <h3>${r.c.name}</h3>
+                        <p>${r.c.psychosomatik.zitat}</p>
                     </div>
-                `).join('')}
-            </div>
-        </div>
-
-        <!-- KNOWLEDGE TABS -->
-        <div class="knowledge-section">
-            <h3>Ganzheitliches Wissen — Die sechs Säulen</h3>
-            <div class="pillar-tabs">
-                <div class="pillar-tab active" onclick="switchTab(this, 'tab-psycho-${c.id}')">Psychosomatik</div>
-                <div class="pillar-tab" onclick="switchTab(this, 'tab-kraeuter-${c.id}')">Kräuter & Stoffe</div>
-                <div class="pillar-tab" onclick="switchTab(this, 'tab-ernaehrung-${c.id}')">Ernährung</div>
-                <div class="pillar-tab" onclick="switchTab(this, 'tab-fasten-${c.id}')">Fasten & Reinigung</div>
-                <div class="pillar-tab" onclick="switchTab(this, 'tab-bewegung-${c.id}')">Bewegung & Natur</div>
-                <div class="pillar-tab" onclick="switchTab(this, 'tab-geist-${c.id}')">Seele, Geist & Bewusstsein</div>
-            </div>
-
-            <!-- Psychosomatik -->
-            <div class="pillar-content visible" id="tab-psycho-${c.id}">
-                <div class="info-card"><p>"${c.psychosomatik.zitat}"</p></div>
-                <h4>Was will dein Körper dir sagen?</h4>
-                <p>${c.psychosomatik.text}</p>
-                <h4>Was passiert im Körper?</h4>
-                <p>${c.koerper}</p>
-            </div>
-
-            <!-- Kräuter & Stoffe -->
-            <div class="pillar-content" id="tab-kraeuter-${c.id}">
-                <h4>Kräuter</h4>
-                <ul>${c.kraeuter.map(k => `<li><strong>${k.name}</strong> — ${k.wirkung}</li>`).join('')}</ul>
-                <h4>Stoffe & Substanzen</h4>
-                <ul>${c.stoffe.map(s => `<li><strong>${s.name}</strong> — ${s.wirkung}</li>`).join('')}</ul>
-                <h4>Was empfehlen die Traditionen?</h4>
-                <h4 style="font-size:0.95rem; margin-top:0.75rem;">Europäische Volksmedizin</h4>
-                <p>${c.traditionen.volksmedizin}</p>
-                <h4 style="font-size:0.95rem;">TCM</h4>
-                <p>${c.traditionen.tcm}</p>
-                <h4 style="font-size:0.95rem;">Ayurveda</h4>
-                <p>${c.traditionen.ayurveda}</p>
-                <h4 style="font-size:0.95rem;">Germanische Heilkunde</h4>
-                <p>${c.traditionen.germanisch}</p>
-                <h4 style="font-size:0.95rem;">Alchemie / Spagyrik</h4>
-                <p>${c.traditionen.alchemie}</p>
-            </div>
-
-            <!-- Ernährung -->
-            <div class="pillar-content" id="tab-ernaehrung-${c.id}">
-                <h4>Ernährungsempfehlung</h4>
-                <p>${c.ernaehrung.empfehlung}</p>
-                <h4>Lebensmittel, die stärken</h4>
-                <ul>${c.ernaehrung.staerkend.map(s => `<li>${s}</li>`).join('')}</ul>
-                <h4>Was in dieser Phase ruhen darf</h4>
-                <ul>${c.ernaehrung.meiden.map(m => `<li>${m}</li>`).join('')}</ul>
-                ${c.ernaehrung.rezepte.map(r => `
-                    <div class="recipe-card">
-                        <h5>${r.name}</h5>
-                        <div class="recipe-meta">${r.zutaten}</div>
-                        <p>${r.zubereitung}</p>
-                    </div>
-                `).join('')}
-            </div>
-
-            <!-- Fasten -->
-            <div class="pillar-content" id="tab-fasten-${c.id}">
-                <h4>Fasten bei ${c.name}</h4>
-                <p>${c.fasten.text}</p>
-                <h4>Empfohlene Fastenformen</h4>
-                <ul>${c.fasten.formen.map(f => `<li>${f}</li>`).join('')}</ul>
-                <h4>Reinigungstechniken</h4>
-                <ul>${c.fasten.reinigung.map(r => `<li>${r}</li>`).join('')}</ul>
-            </div>
-
-            <!-- Bewegung -->
-            <div class="pillar-content" id="tab-bewegung-${c.id}">
-                <h4>Bewegung & Natur</h4>
-                <p>${c.bewegung.text}</p>
-                <ul>${c.bewegung.praktiken.map(p => `<li>${p}</li>`).join('')}</ul>
-            </div>
-
-            <!-- Geist -->
-            <div class="pillar-content" id="tab-geist-${c.id}">
-                <h4>Seele, Geist & Bewusstsein — Die Einheit</h4>
-                <p>${c.geist.einheit}</p>
-                <h4>Heilsätze & Affirmationen</h4>
-                <div class="affirm-list">${c.geist.affirmationen.map(a => `<div class="affirm-item">"${a}"</div>`).join('')}</div>
-                <h4>Meditation & Stille</h4>
-                <p>${c.geist.meditation}</p>
-                <h4>Energiearbeit</h4>
-                <p>${c.geist.energie}</p>
-            </div>
-        </div>
-
-        <div style="margin-top:2rem; padding:1.25rem; background:var(--green-bg); border-radius:var(--radius); text-align:center;">
-            <p style="color:var(--text-medium); font-style:italic; font-size:0.9rem; margin:0;">
-                Erfahrungswissen, geteilt unter Freunden. Dein Arzt begleitet dich auf dem medizinischen Weg — wir begleiten dich auf dem ganzheitlichen.<br>
-                <strong>Dein Körper hat die Kraft zu heilen. Dein Geist hat die Kraft, ihn dabei zu führen. Deine Seele weiß den Weg.</strong>
-            </p>
+                    <span class="arrow">&#x2192;</span>
+                </div>
+            `).join('')}
         </div>
     `;
 }
 
-function switchTab(el, tabId) {
-    const parent = el.closest('.knowledge-section');
-    parent.querySelectorAll('.pillar-tab').forEach(t => t.classList.remove('active'));
-    parent.querySelectorAll('.pillar-content').forEach(c => c.classList.remove('visible'));
-    el.classList.add('active');
-    document.getElementById(tabId).classList.add('visible');
+function showDetail(c) {
+    const stream = document.getElementById('resultsStream');
+    stream.classList.add('visible');
+
+    // Build sticky nav
+    const nav = document.getElementById('sectionNav');
+    const sections = [
+        { id: 'sec-produkte', label: 'Produkte' },
+        { id: 'sec-psycho', label: 'Psychosomatik' },
+        { id: 'sec-kraeuter', label: 'Kräuter & Stoffe' },
+        { id: 'sec-ernaehrung', label: 'Ernährung' },
+        { id: 'sec-fasten', label: 'Fasten' },
+        { id: 'sec-bewegung', label: 'Bewegung' },
+        { id: 'sec-geist', label: 'Seele & Geist' },
+        { id: 'sec-traditionen', label: 'Traditionen' },
+    ];
+    nav.innerHTML = sections.map(s => `<a href="#${s.id}" onclick="smoothScroll('${s.id}'); return false;">${s.label}</a>`).join('');
+    nav.classList.add('visible');
+
+    stream.innerHTML = `
+        <!-- TITLE -->
+        <div class="result-block">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--green-dark); margin-bottom:0.25rem;">${c.name}</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:0.5rem;">
+                ${c.tags.map(t => `<span class="tag" onclick="doSearch('${t.replace('#','')}')" style="font-size:0.72rem; color:var(--green-main); background:var(--green-pale); padding:0.15rem 0.5rem; border-radius:50px; cursor:pointer;">${t}</span>`).join('')}
+            </div>
+        </div>
+
+        <!-- PRODUKTE (FIRST!) -->
+        <h3 class="section-header" id="sec-produkte">Im Heildepot erhältlich</h3>
+        <div class="section-divider"></div>
+        ${c.produkte.map(p => `
+            <div class="product-card-big">
+                <div class="product-info">
+                    <h4>${p.name}</h4>
+                    <p>${p.desc}</p>
+                    <div class="tags">${(p.tags||[]).map(t => `<span class="tag" onclick="event.stopPropagation(); doSearch('${t.replace('#','')}')">${t}</span>`).join('')}</div>
+                </div>
+                <a href="https://heildepot.de" target="_blank" class="product-cta-btn">Bestellen</a>
+            </div>
+        `).join('')}
+
+        <!-- PSYCHOSOMATIK -->
+        <h3 class="section-header" id="sec-psycho">Was will dein Körper dir sagen?</h3>
+        <div class="section-divider"></div>
+        <div class="quote-block"><p>"${c.psychosomatik.zitat}"</p></div>
+        <div class="info-block">
+            <p>${c.psychosomatik.text}</p>
+        </div>
+        <div class="info-block">
+            <h4>Was passiert im Körper?</h4>
+            <p>${c.koerper}</p>
+        </div>
+
+        <!-- KRÄUTER & STOFFE -->
+        <h3 class="section-header" id="sec-kraeuter">Kräuter & Heilmittel</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <h4>Kräuter</h4>
+            <ul>${c.kraeuter.map(k => `<li><strong>${k.name}</strong> — ${k.wirkung}</li>`).join('')}</ul>
+        </div>
+        <div class="info-block">
+            <h4>Stoffe & Substanzen</h4>
+            <ul>${c.stoffe.map(s => `<li><strong>${s.name}</strong> — ${s.wirkung}</li>`).join('')}</ul>
+        </div>
+
+        <!-- ERNÄHRUNG -->
+        <h3 class="section-header" id="sec-ernaehrung">Ernährung & Rezepte</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <h4>Empfehlung</h4>
+            <p>${c.ernaehrung.empfehlung}</p>
+            <h4>Lebensmittel, die stärken</h4>
+            <ul>${c.ernaehrung.staerkend.map(s => `<li>${s}</li>`).join('')}</ul>
+            <h4>Was in dieser Phase ruhen darf</h4>
+            <ul>${c.ernaehrung.meiden.map(m => `<li>${m}</li>`).join('')}</ul>
+        </div>
+        ${c.ernaehrung.rezepte.map(r => `
+            <div class="recipe-block">
+                <h5>${r.name}</h5>
+                <div class="meta">${r.zutaten}</div>
+                <p>${r.zubereitung}</p>
+            </div>
+        `).join('')}
+
+        <!-- FASTEN -->
+        <h3 class="section-header" id="sec-fasten">Fasten & Reinigung</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <p>${c.fasten.text}</p>
+            <h4>Fastenformen</h4>
+            <ul>${c.fasten.formen.map(f => `<li>${f}</li>`).join('')}</ul>
+            <h4>Reinigungstechniken</h4>
+            <ul>${c.fasten.reinigung.map(r => `<li>${r}</li>`).join('')}</ul>
+        </div>
+
+        <!-- BEWEGUNG -->
+        <h3 class="section-header" id="sec-bewegung">Bewegung & Natur</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <p>${c.bewegung.text}</p>
+            <ul>${c.bewegung.praktiken.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+
+        <!-- GEIST -->
+        <h3 class="section-header" id="sec-geist">Seele, Geist & Bewusstsein</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <p>${c.geist.einheit}</p>
+        </div>
+        <div class="info-block">
+            <h4>Heilsätze</h4>
+            <div class="affirm-block">${c.geist.affirmationen.map(a => `<div class="affirm-item">"${a}"</div>`).join('')}</div>
+        </div>
+        <div class="info-block">
+            <h4>Meditation & Stille</h4>
+            <p>${c.geist.meditation}</p>
+        </div>
+        <div class="info-block">
+            <h4>Energiearbeit</h4>
+            <p>${c.geist.energie}</p>
+        </div>
+
+        <!-- TRADITIONEN -->
+        <h3 class="section-header" id="sec-traditionen">Was empfehlen die Traditionen?</h3>
+        <div class="section-divider"></div>
+        <div class="info-block">
+            <h4>Europäische Volksmedizin</h4>
+            <p>${c.traditionen.volksmedizin}</p>
+        </div>
+        <div class="info-block">
+            <h4>TCM — Traditionelle Chinesische Medizin</h4>
+            <p>${c.traditionen.tcm}</p>
+        </div>
+        <div class="info-block">
+            <h4>Ayurveda</h4>
+            <p>${c.traditionen.ayurveda}</p>
+        </div>
+        <div class="info-block">
+            <h4>Germanische Heilkunde</h4>
+            <p>${c.traditionen.germanisch}</p>
+        </div>
+        <div class="info-block">
+            <h4>Alchemie / Spagyrik</h4>
+            <p>${c.traditionen.alchemie}</p>
+        </div>
+
+        <!-- CLOSING -->
+        <div class="closing-note">
+            <p>Erfahrungswissen, geteilt unter Freunden. Dein Arzt begleitet dich auf dem medizinischen Weg — wir begleiten dich auf dem ganzheitlichen.
+            <strong>Dein Körper hat die Kraft zu heilen. Dein Geist hat die Kraft, ihn dabei zu führen. Deine Seele weiß den Weg.</strong></p>
+        </div>
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Highlight active nav on scroll
+    setupScrollSpy();
 }
 
-function goBack() {
-    if (lastQuery) {
-        showResults(lastQuery);
-    } else {
-        showAllConditions();
-    }
+function smoothScroll(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function showHome() {
-    currentView = 'home';
-    document.getElementById('homeContent').style.display = 'block';
-    document.getElementById('resultsArea').classList.remove('visible');
-    document.getElementById('detailView').classList.remove('visible');
-    document.getElementById('searchInput').value = '';
+function setupScrollSpy() {
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                document.querySelectorAll('.section-nav a').forEach(a => {
+                    a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+                });
+            }
+        });
+    }, { rootMargin: '-60px 0px -70% 0px' });
+
+    document.querySelectorAll('.section-header').forEach(h => observer.observe(h));
 }
 
-function setFilter(el) {
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    activeFilter = el.dataset.filter;
-    const q = document.getElementById('searchInput').value.trim();
-    if (q.length > 1) showResults(q);
-}
-
-// Init
-init();
+// Enter key on search
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleSearch(this.value);
+});
 </script>
+
 </body>
 </html>
