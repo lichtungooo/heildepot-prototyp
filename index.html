@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heildepot — Ganzheitlich unter Freunden</title>
+    <title>HEILDEPOT — Ganzheitlich unter Freunden</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
@@ -100,6 +100,8 @@
             font-weight: 700;
             color: var(--green-dark);
             transition: font-size 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         .landing.collapsed .logo-title { font-size: 1.4rem; }
@@ -358,6 +360,204 @@
 
         .footer-mini a { color: var(--text-light); text-decoration: none; }
 
+        /* ===== WARENKORB ===== */
+        .cart-btn {
+            position: fixed;
+            top: 1rem;
+            right: 7rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            z-index: 200;
+            padding: 0.4rem 1rem;
+            border: 1.5px solid var(--green-pale);
+            border-radius: 8px;
+            background: var(--white);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .cart-btn:hover { border-color: var(--green-medium); color: var(--green-main); }
+
+        .cart-badge {
+            background: var(--green-main);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-badge.visible { display: flex; }
+
+        .cart-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 300;
+        }
+
+        .cart-overlay.open { display: block; }
+
+        .cart-drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 380px;
+            max-width: 90vw;
+            height: 100vh;
+            background: var(--white);
+            z-index: 301;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-drawer.open { right: 0; }
+
+        .cart-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--green-pale);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--green-dark); }
+
+        .cart-close {
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            background: none;
+            border: none;
+            padding: 0.25rem;
+        }
+
+        .cart-close:hover { color: var(--text-dark); }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1.25rem;
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--green-pale);
+        }
+
+        .cart-item-info { flex: 1; }
+        .cart-item-info h4 { font-size: 0.9rem; color: var(--green-dark); font-weight: 600; }
+        .cart-item-info .ci-menge { font-size: 0.75rem; color: var(--text-light); }
+        .cart-item-info .ci-preis { font-size: 0.9rem; color: var(--green-main); font-weight: 600; margin-top: 0.2rem; }
+
+        .cart-item-actions { display: flex; align-items: center; gap: 0.5rem; margin-left: 0.75rem; }
+
+        .qty-btn {
+            width: 28px; height: 28px;
+            border: 1.5px solid var(--green-pale);
+            border-radius: 6px;
+            background: var(--white);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-medium);
+        }
+
+        .qty-btn:hover { border-color: var(--green-medium); background: var(--green-pale); }
+
+        .qty-num { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); min-width: 20px; text-align: center; }
+
+        .cart-item-remove {
+            background: none; border: none; color: var(--text-muted); cursor: pointer;
+            font-size: 0.8rem; margin-top: 0.25rem;
+        }
+
+        .cart-item-remove:hover { color: #c44; }
+
+        .cart-footer {
+            padding: 1.25rem;
+            border-top: 2px solid var(--green-pale);
+            background: var(--green-bg);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 1rem;
+        }
+
+        .cart-checkout {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: var(--green-main);
+            color: white;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .cart-checkout:hover { background: var(--green-dark); }
+
+        .cart-note { font-size: 0.72rem; color: var(--text-light); text-align: center; margin-top: 0.5rem; }
+
+        /* Product card with cart */
+        .product-card-big .product-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+        .product-card-big .product-price { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--green-main); margin-bottom: 0.15rem; }
+        .product-card-big .product-menge { font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.4rem; }
+
+        .add-to-cart {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--green-main);
+            color: white;
+            padding: 0.5rem 1.1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .add-to-cart:hover { background: var(--green-dark); transform: scale(1.02); }
+        .add-to-cart.added { background: var(--green-dark); }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .landing { padding: 1.5rem; }
@@ -378,8 +578,28 @@
 </head>
 <body>
 
-<!-- Login -->
+<!-- Login & Cart -->
+<div class="cart-btn" onclick="toggleCart()">
+    &#x1F6D2; Warenkorb <span class="cart-badge" id="cartBadge">0</span>
+</div>
 <a href="#" class="login-btn">Anmelden</a>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3>Dein Warenkorb</h3>
+        <button class="cart-close" onclick="toggleCart()">&#x2715;</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+        <div class="cart-empty">Dein Warenkorb ist noch leer.<br>Gib deine Symptome ein und finde passende Heilmittel.</div>
+    </div>
+    <div class="cart-footer">
+        <div class="cart-total"><span>Gesamt</span><span id="cartTotal">0,- €</span></div>
+        <button class="cart-checkout" onclick="checkout()">Anfrage senden</button>
+        <div class="cart-note">Deine Anfrage geht direkt an René im Heildepot.</div>
+    </div>
+</div>
 
 <!-- LANDING (centered, Claude-style) -->
 <div class="landing" id="landing">
@@ -389,7 +609,7 @@
                 <path d="M35,8 C35,4 38,0 42,0 L58,0 C62,0 65,4 65,8 L65,35 L92,35 C96,35 100,38 100,42 L100,58 C100,62 96,65 92,65 L65,65 L65,92 C65,96 62,100 58,100 L42,100 C38,100 35,96 35,92 L35,65 L8,65 C4,65 0,62 0,58 L0,42 C0,38 4,35 8,35 L35,35 Z" fill="#6aab3d"/>
             </svg>
         </div>
-        <div class="logo-title">Heildepot</div>
+        <div class="logo-title">HEILDEPOT</div>
         <div class="logo-subtitle">Ganzheitlich unter Freunden</div>
     </div>
 
@@ -417,6 +637,7 @@
 
 <script src="data-1.js"></script>
 <script src="data-2.js"></script>
+<script src="products.js"></script>
 <script>
 const ALL = [...CONDITIONS_1, ...CONDITIONS_2];
 
@@ -546,16 +767,19 @@ function showDetail(c) {
         </div>
 
         <!-- PRODUKTE (FIRST!) -->
-        <h3 class="section-header" id="sec-produkte">Im Heildepot erhältlich</h3>
+        <h3 class="section-header" id="sec-produkte">Im HEILDEPOT erhältlich</h3>
         <div class="section-divider"></div>
-        ${c.produkte.map(p => `
+        ${getProductsForCondition(c.id).map(p => `
             <div class="product-card-big">
                 <div class="product-info">
                     <h4>${p.name}</h4>
+                    <div class="product-price">${p.preis},- €</div>
+                    <div class="product-menge">${p.menge}</div>
                     <p>${p.desc}</p>
+                    <p style="font-size:0.82rem; color:var(--text-medium);"><strong>Wirkung:</strong> ${p.wirkung}</p>
                     <div class="tags">${(p.tags||[]).map(t => `<span class="tag" onclick="event.stopPropagation(); doSearch('${t.replace('#','')}')">${t}</span>`).join('')}</div>
                 </div>
-                <a href="https://heildepot.de" target="_blank" class="product-cta-btn">Bestellen</a>
+                <button class="add-to-cart" onclick="addToCart('${p.id}')" id="atc-${p.id}">&#x1F6D2; In den Warenkorb</button>
             </div>
         `).join('')}
 
@@ -701,6 +925,121 @@ function setupScrollSpy() {
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') handleSearch(this.value);
 });
+
+// ===== WARENKORB =====
+let cart = JSON.parse(localStorage.getItem('heildepot_cart') || '[]');
+updateCartUI();
+
+function addToCart(productId) {
+    const product = PRODUCTS.find(p => p.id === productId);
+    if (!product) return;
+
+    const existing = cart.find(item => item.id === productId);
+    if (existing) {
+        existing.qty += 1;
+    } else {
+        cart.push({ id: productId, qty: 1 });
+    }
+
+    saveCart();
+    updateCartUI();
+
+    // Button feedback
+    const btn = document.getElementById('atc-' + productId);
+    if (btn) {
+        btn.classList.add('added');
+        btn.innerHTML = '&#x2713; Hinzugefügt';
+        setTimeout(() => {
+            btn.classList.remove('added');
+            btn.innerHTML = '&#x1F6D2; In den Warenkorb';
+        }, 1500);
+    }
+}
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    saveCart();
+    updateCartUI();
+}
+
+function changeQty(productId, delta) {
+    const item = cart.find(i => i.id === productId);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+    }
+    saveCart();
+    updateCartUI();
+}
+
+function saveCart() {
+    localStorage.setItem('heildepot_cart', JSON.stringify(cart));
+}
+
+function updateCartUI() {
+    const badge = document.getElementById('cartBadge');
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    badge.textContent = totalItems;
+    badge.classList.toggle('visible', totalItems > 0);
+
+    const container = document.getElementById('cartItems');
+    const totalEl = document.getElementById('cartTotal');
+
+    if (cart.length === 0) {
+        container.innerHTML = '<div class="cart-empty">Dein Warenkorb ist noch leer.<br>Gib deine Symptome ein und finde passende Heilmittel.</div>';
+        totalEl.textContent = '0,- €';
+        return;
+    }
+
+    let total = 0;
+    container.innerHTML = cart.map(item => {
+        const p = PRODUCTS.find(pr => pr.id === item.id);
+        if (!p) return '';
+        const subtotal = p.preis * item.qty;
+        total += subtotal;
+        return `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${p.name}</h4>
+                    <div class="ci-menge">${p.menge}</div>
+                    <div class="ci-preis">${subtotal},- €</div>
+                    <button class="cart-item-remove" onclick="removeFromCart('${p.id}')">Entfernen</button>
+                </div>
+                <div class="cart-item-actions">
+                    <button class="qty-btn" onclick="changeQty('${p.id}', -1)">−</button>
+                    <span class="qty-num">${item.qty}</span>
+                    <button class="qty-btn" onclick="changeQty('${p.id}', 1)">+</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    totalEl.textContent = total + ',- €';
+}
+
+function toggleCart() {
+    document.getElementById('cartOverlay').classList.toggle('open');
+    document.getElementById('cartDrawer').classList.toggle('open');
+}
+
+function checkout() {
+    if (cart.length === 0) return;
+
+    // Build order text
+    let total = 0;
+    const lines = cart.map(item => {
+        const p = PRODUCTS.find(pr => pr.id === item.id);
+        if (!p) return '';
+        const subtotal = p.preis * item.qty;
+        total += subtotal;
+        return `${item.qty}× ${p.name} (${p.menge}) — ${subtotal},- €`;
+    });
+
+    const orderText = `Hallo René,\n\nich möchte gerne folgendes bestellen:\n\n${lines.join('\n')}\n\nGesamt: ${total},- €\n\nHerzliche Grüße`;
+    const mailTo = `mailto:?subject=Heildepot Bestellung&body=${encodeURIComponent(orderText)}`;
+    window.open(mailTo);
+}
 </script>
 
 </body>
