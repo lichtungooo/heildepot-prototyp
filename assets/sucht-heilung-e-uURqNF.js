@@ -1,0 +1,1 @@
+var e=[],t=[];export{t as HEILANSAETZE_SUCHT,e as SUCHTFORMEN};
