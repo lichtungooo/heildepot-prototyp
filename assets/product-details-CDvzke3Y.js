@@ -1,0 +1,1 @@
+var e=[];export{e as PRODUCT_GROUPS};
